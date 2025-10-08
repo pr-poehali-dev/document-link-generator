@@ -58,6 +58,28 @@ const DocumentCard = ({
   setLoanFormData,
   setContactFormData,
 }: DocumentCardProps) => {
+  const buildDocumentUrl = (docType: string) => {
+    const isLoan = docType === 'loan';
+    let url = doc.url;
+    
+    if (isLoan) {
+      url += `&fullName=${encodeURIComponent(loanFormData.fullName)}`;
+      url += `&birthDate=${encodeURIComponent(loanFormData.birthDate)}`;
+      url += `&passportSeries=${encodeURIComponent(loanFormData.passportSeries)}`;
+      url += `&passportNumber=${encodeURIComponent(loanFormData.passportNumber)}`;
+      url += `&amount=${encodeURIComponent(loanFormData.amount)}`;
+      url += `&term=${encodeURIComponent(loanFormData.term)}`;
+      url += `&phone=${encodeURIComponent(loanFormData.phone)}`;
+      url += `&email=${encodeURIComponent(loanFormData.email)}`;
+    } else {
+      url += `&phone=${encodeURIComponent(contactFormData.phone)}`;
+      url += `&email=${encodeURIComponent(contactFormData.email)}`;
+      url += `&fullName=${encodeURIComponent(contactFormData.fullName)}`;
+    }
+    
+    return url;
+  };
+
   return (
     <Card 
       className="p-6 hover:shadow-lg transition-all duration-300 border-2 hover:border-primary/20 animate-fade-in"
@@ -144,11 +166,27 @@ const DocumentCard = ({
                     Сохранить как шаблон
                   </Button>
                   <Button 
+                    onClick={() => {
+                      if (doc.type === 'loan') {
+                        if (!loanFormData.fullName || !loanFormData.amount || !loanFormData.term) {
+                          return;
+                        }
+                      }
+                      const url = buildDocumentUrl(doc.type);
+                      window.open(url, '_blank');
+                    }} 
+                    variant="outline"
+                    className="w-full sm:w-auto gap-2 border-blue-500 text-blue-600 hover:bg-blue-50"
+                  >
+                    <Icon name="Eye" size={18} />
+                    Просмотреть
+                  </Button>
+                  <Button 
                     onClick={() => onGenerateDocument(doc.type)} 
                     className="w-full sm:flex-1 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 gap-2 h-12 text-base font-semibold"
                   >
-                    <Icon name="FileDown" size={20} />
-                    Сформировать документ
+                    <Icon name="Download" size={20} />
+                    Скачать PDF
                   </Button>
                 </DialogFooter>
               </DialogContent>
