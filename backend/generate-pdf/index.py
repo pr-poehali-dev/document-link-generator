@@ -82,11 +82,53 @@ def draw_signature(c, sig_data: str, x: float, y: float, max_width: float = 40*m
 
 def draw_text_signature(c, x: float, y: float, font_name: str = 'Helvetica'):
     from reportlab.lib.colors import HexColor
-    blue_dark = HexColor('#1e40af')
+    blue_ink = HexColor('#1e3a8a')
     
-    c.setFillColor(blue_dark)
-    c.setFont('Helvetica-BoldOblique', 16)
-    c.drawString(x, y, "Малик С.В.")
+    c.saveState()
+    c.translate(x, y)
+    c.rotate(-5)
+    
+    c.setStrokeColor(blue_ink)
+    c.setLineWidth(1.5)
+    c.setLineCap(1)
+    
+    path = c.beginPath()
+    path.moveTo(0, 0)
+    path.curveTo(3, 8, 8, 12, 15, 10)
+    path.curveTo(20, 8, 22, 2, 20, -2)
+    c.drawPath(path, stroke=1, fill=0)
+    
+    path = c.beginPath()
+    path.moveTo(25, 8)
+    path.curveTo(28, 12, 32, 10, 35, 5)
+    path.lineTo(35, -3)
+    c.drawPath(path, stroke=1, fill=0)
+    
+    path = c.beginPath()
+    path.moveTo(40, 10)
+    path.curveTo(42, 8, 45, 8, 48, 10)
+    path.curveTo(50, 12, 52, 8, 52, 4)
+    path.curveTo(52, 0, 50, -2, 48, 0)
+    c.drawPath(path, stroke=1, fill=0)
+    
+    path = c.beginPath()
+    path.moveTo(55, 8)
+    path.lineTo(55, -3)
+    path.moveTo(55, 2)
+    path.curveTo(58, 4, 62, 2, 62, -2)
+    c.drawPath(path, stroke=1, fill=0)
+    
+    path = c.beginPath()
+    path.moveTo(67, 10)
+    path.curveTo(70, 6, 72, 4, 75, 6)
+    path.curveTo(78, 8, 78, 2, 75, 0)
+    c.drawPath(path, stroke=1, fill=0)
+    
+    c.setFont('Helvetica-Oblique', 10)
+    c.setFillColor(HexColor('#374151'))
+    c.drawString(85, -5, "C.B.")
+    
+    c.restoreState()
 
 def draw_header_decoration(c, width, height):
     from reportlab.lib.colors import HexColor
