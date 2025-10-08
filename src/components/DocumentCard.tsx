@@ -109,79 +109,78 @@ const DocumentCard = ({
                 Заполнить договор
               </Button>
             </DialogTrigger>
-              <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-                <DialogHeader className="pb-4 border-b">
-                  <div className="flex items-center gap-3">
-                    <div className="bg-primary/10 p-2 rounded-lg">
-                      <Icon name={doc.icon as any} size={24} className="text-primary" />
-                    </div>
-                    <div>
-                      <DialogTitle className="text-xl">{doc.title}</DialogTitle>
-                      <p className="text-sm text-gray-500 mt-1">Заполните форму для формирования документа</p>
-                    </div>
+            <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader className="pb-4 border-b">
+                <div className="flex items-center gap-3">
+                  <div className="bg-primary/10 p-2 rounded-lg">
+                    <Icon name={doc.icon as any} size={24} className="text-primary" />
                   </div>
-                </DialogHeader>
-                <div className="py-4">
-                  {doc.type === 'loan' ? (
-                    <LoanForm formData={loanFormData} onChange={setLoanFormData} />
-                  ) : (
-                    <ContactForm formData={contactFormData} onChange={setContactFormData} />
-                  )}
+                  <div>
+                    <DialogTitle className="text-xl">{doc.title}</DialogTitle>
+                    <p className="text-sm text-gray-500 mt-1">Заполните форму для формирования документа</p>
+                  </div>
                 </div>
-                <DialogFooter className="flex-col sm:flex-row gap-2 pt-4 border-t">
-                  <Button 
-                    onClick={() => onSaveTemplate(
-                      doc.type === 'loan' ? loanFormData : contactFormData,
-                      doc.type === 'loan' ? 'loan' : 'contact'
-                    )} 
-                    variant="outline"
-                    className="w-full sm:w-auto gap-2"
-                  >
-                    <Icon name="BookmarkPlus" size={18} />
-                    Сохранить как шаблон
-                  </Button>
-                  <Button 
-                    onClick={() => {
-                      if (doc.type === 'loan') {
-                        if (!loanFormData.fullName || !loanFormData.amount || !loanFormData.term) {
-                          return;
-                        }
+              </DialogHeader>
+              <div className="py-4">
+                {doc.type === 'loan' ? (
+                  <LoanForm formData={loanFormData} onChange={setLoanFormData} />
+                ) : (
+                  <ContactForm formData={contactFormData} onChange={setContactFormData} />
+                )}
+              </div>
+              <DialogFooter className="flex-col sm:flex-row gap-2 pt-4 border-t">
+                <Button 
+                  onClick={() => onSaveTemplate(
+                    doc.type === 'loan' ? loanFormData : contactFormData,
+                    doc.type === 'loan' ? 'loan' : 'contact'
+                  )} 
+                  variant="outline"
+                  className="w-full sm:w-auto gap-2"
+                >
+                  <Icon name="BookmarkPlus" size={18} />
+                  Сохранить как шаблон
+                </Button>
+                <Button 
+                  onClick={() => {
+                    if (doc.type === 'loan') {
+                      if (!loanFormData.fullName || !loanFormData.amount || !loanFormData.term) {
+                        return;
                       }
-                      const url = buildDocumentUrl(doc.type);
-                      window.open(url, '_blank');
-                    }} 
-                    variant="outline"
-                    className="w-full sm:w-auto gap-2 border-blue-500 text-blue-600 hover:bg-blue-50"
-                  >
-                    <Icon name="Eye" size={18} />
-                    Просмотреть
-                  </Button>
-                  <Button 
-                    onClick={() => {
-                      const url = buildDocumentUrl(doc.type);
-                      onCopyLink(url, doc.id);
-                    }}
-                    variant="outline"
-                    className="w-full sm:w-auto gap-2"
-                  >
-                    <Icon 
-                      name={copiedId === doc.id ? "Check" : "Link"} 
-                      size={18} 
-                      className={copiedId === doc.id ? "text-green-600" : ""}
-                    />
-                    {copiedId === doc.id ? "Скопировано" : "Копировать ссылку"}
-                  </Button>
-                  <Button 
-                    onClick={() => onGenerateDocument(doc.type)} 
-                    className="w-full sm:flex-1 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 gap-2 h-12 text-base font-semibold"
-                  >
-                    <Icon name="Download" size={20} />
-                    Скачать PDF
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
-          </div>
+                    }
+                    const url = buildDocumentUrl(doc.type);
+                    window.open(url, '_blank');
+                  }} 
+                  variant="outline"
+                  className="w-full sm:w-auto gap-2 border-blue-500 text-blue-600 hover:bg-blue-50"
+                >
+                  <Icon name="Eye" size={18} />
+                  Просмотреть
+                </Button>
+                <Button 
+                  onClick={() => {
+                    const url = buildDocumentUrl(doc.type);
+                    onCopyLink(url, doc.id);
+                  }}
+                  variant="outline"
+                  className="w-full sm:w-auto gap-2"
+                >
+                  <Icon 
+                    name={copiedId === doc.id ? "Check" : "Link"} 
+                    size={18} 
+                    className={copiedId === doc.id ? "text-green-600" : ""}
+                  />
+                  {copiedId === doc.id ? "Скопировано" : "Копировать ссылку"}
+                </Button>
+                <Button 
+                  onClick={() => onGenerateDocument(doc.type)} 
+                  className="w-full sm:flex-1 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 gap-2 h-12 text-base font-semibold"
+                >
+                  <Icon name="Download" size={20} />
+                  Скачать PDF
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
     </Card>
