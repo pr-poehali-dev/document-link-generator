@@ -15,22 +15,6 @@ const documents = [
     url: `${BASE_URL}?type=loan`,
     icon: "FileText",
     type: "loan"
-  },
-  {
-    id: 2,
-    title: "Согласие на обработку персональных данных",
-    description: "Документ о согласии на сбор и обработку персональных данных в соответствии с законодательством",
-    url: `${BASE_URL}?type=consent`,
-    icon: "Shield",
-    type: "consent"
-  },
-  {
-    id: 3,
-    title: "Возврат платежей",
-    description: "Порядок и условия возврата денежных средств согласно действующему законодательству",
-    url: `${BASE_URL}?type=refund`,
-    icon: "ArrowLeftRight",
-    type: "refund"
   }
 ];
 
