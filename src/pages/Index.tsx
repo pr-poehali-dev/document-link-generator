@@ -38,7 +38,7 @@ interface ContactFormData {
 const Index = () => {
   const { toast } = useToast();
   const [copiedId, setCopiedId] = useState<number | null>(null);
-  const [logo, setLogo] = useState<string | null>(null);
+  const [logo, setLogo] = useState<string | null>("https://cdn.poehali.dev/files/f057e0f1-7582-451c-9ab8-5032ba8a2f4d.jpg");
   const [signature, setSignature] = useState<string | null>(null);
   const [openDialog, setOpenDialog] = useState<string | null>(null);
   const [loanFormData, setLoanFormData] = useState<LoanFormData>({
