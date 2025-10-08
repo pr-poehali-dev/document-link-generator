@@ -54,26 +54,39 @@ def draw_logo(c, logo_data: str, x: float, y: float, max_width: float = 30*mm, m
 def draw_signature(c, sig_data: str, x: float, y: float, max_width: float = 40*mm, max_height: float = 15*mm):
     try:
         from reportlab.lib.utils import ImageReader
-        if sig_data.startswith('data:image'):
-            sig_data = sig_data.split(',')[1]
-        
-        img_bytes = base64.b64decode(sig_data)
-        img = ImageReader(BytesIO(img_bytes))
-        
-        iw, ih = img.getSize()
-        aspect = ih / float(iw)
-        
-        if iw > max_width / (1/72*25.4):
-            iw = max_width / (1/72*25.4)
-            ih = iw * aspect
-        
-        if ih > max_height / (1/72*25.4):
-            ih = max_height / (1/72*25.4)
-            iw = ih / aspect
-        
-        c.drawImage(img, x, y, width=iw*72/25.4*mm, height=ih*72/25.4*mm, mask='auto')
+        if sig_data.startswith('data:image') or sig_data.startswith('http'):
+            if sig_data.startswith('data:image'):
+                sig_data = sig_data.split(',')[1]
+                img_bytes = base64.b64decode(sig_data)
+            else:
+                import urllib.request
+                response = urllib.request.urlopen(sig_data)
+                img_bytes = response.read()
+            
+            img = ImageReader(BytesIO(img_bytes))
+            
+            iw, ih = img.getSize()
+            aspect = ih / float(iw)
+            
+            if iw > max_width / (1/72*25.4):
+                iw = max_width / (1/72*25.4)
+                ih = iw * aspect
+            
+            if ih > max_height / (1/72*25.4):
+                ih = max_height / (1/72*25.4)
+                iw = ih / aspect
+            
+            c.drawImage(img, x, y, width=iw*72/25.4*mm, height=ih*72/25.4*mm, mask='auto')
     except:
         pass
+
+def draw_text_signature(c, x: float, y: float, font_name: str = 'Helvetica'):
+    from reportlab.lib.colors import HexColor
+    blue_dark = HexColor('#1e40af')
+    
+    c.setFillColor(blue_dark)
+    c.setFont('Helvetica-BoldOblique', 16)
+    c.drawString(x, y, "Малик С.В.")
 
 def draw_header_decoration(c, width, height):
     from reportlab.lib.colors import HexColor
@@ -368,6 +381,8 @@ def create_loan_agreement(logo: str = None, signature: str = None, client_data: 
     
     if signature:
         draw_signature(c, signature, 45*mm, 32*mm)
+    else:
+        draw_text_signature(c, 45*mm, 35*mm, font_name)
     
     c.save()
     buffer.seek(0)
@@ -486,6 +501,8 @@ def create_consent_form(logo: str = None, signature: str = None, client_data: Di
     
     if signature:
         draw_signature(c, signature, 45*mm, 32*mm)
+    else:
+        draw_text_signature(c, 45*mm, 35*mm, font_name)
     
     c.save()
     buffer.seek(0)
@@ -623,6 +640,8 @@ def create_refund_policy(logo: str = None, signature: str = None, client_data: D
     
     if signature:
         draw_signature(c, signature, 45*mm, 32*mm)
+    else:
+        draw_text_signature(c, 45*mm, 35*mm, font_name)
     
     c.save()
     buffer.seek(0)
