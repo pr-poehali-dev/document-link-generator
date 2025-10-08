@@ -139,20 +139,36 @@ const Index = () => {
       url += `&signature=${encodeURIComponent(signature)}`;
     }
 
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = '';
-    link.target = '_blank';
-    link.rel = 'noopener noreferrer';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    
     setOpenDialog(null);
     toast({
-      title: "Документ сформирован",
-      description: "PDF файл готов к скачиванию"
+      title: "Загружаем документ...",
+      description: "Пожалуйста, подождите"
     });
+
+    fetch(url)
+      .then(response => response.blob())
+      .then(blob => {
+        const blobUrl = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = blobUrl;
+        link.download = 'dogovor-zajma.pdf';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(blobUrl);
+        
+        toast({
+          title: "Документ скачан!",
+          description: "PDF сохранён в папку Загрузки"
+        });
+      })
+      .catch(() => {
+        toast({
+          title: "Ошибка",
+          description: "Не удалось скачать документ",
+          variant: "destructive"
+        });
+      });
   };
 
   const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
