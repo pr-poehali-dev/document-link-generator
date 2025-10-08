@@ -240,6 +240,19 @@ def create_loan_agreement(logo: str = None, signature: str = None, client_data: 
     else:
         return_date_str = '«__» __________ 20__ г.'
     
+    interest_amount = ''
+    total_amount = ''
+    if amount and amount != '_____________' and term and term != '__':
+        try:
+            loan_amount = float(amount)
+            loan_days = int(term)
+            interest = loan_amount * loan_days * 0.01
+            total = loan_amount + interest
+            interest_amount = f"{interest:,.2f}".replace(',', ' ')
+            total_amount = f"{total:,.2f}".replace(',', ' ')
+        except:
+            pass
+    
     text_lines = [
         ("normal", "Самозанятый Малик Степан Владимирович, ИНН 503303222876,"),
         ("normal", "именуемый в дальнейшем «Займодавец», с одной стороны, и"),
@@ -259,7 +272,16 @@ def create_loan_agreement(logo: str = None, signature: str = None, client_data: 
         ("normal", f"2.1. Сумма займа: {amount} рублей."),
         ("normal", f"2.2. Срок возврата займа: до {return_date_str}."),
         ("normal", f"2.3. Срок займа: {term} дней."),
-        ("normal", "2.4. Проценты за пользование займом: 0% годовых."),
+        ("normal", "2.4. Проценты за пользование займом: 1% в день."),
+    ]
+    
+    if interest_amount and total_amount:
+        text_lines.extend([
+            ("normal", f"2.5. Сумма процентов за весь период: {interest_amount} рублей."),
+            ("normal", f"2.6. ИТОГО К ВОЗВРАТУ: {total_amount} рублей."),
+        ])
+    
+    text_lines.extend([
         ("space", ""),
         ("header", "3. КОНТАКТНЫЕ ДАННЫЕ ЗАЙМОДАВЦА"),
         ("space", ""),
@@ -291,7 +313,7 @@ def create_loan_agreement(logo: str = None, signature: str = None, client_data: 
         ("space", ""),
         ("normal", f"Заемщик: _________________ / {full_name} /"),
         ("normal", f"Дата подписания: {date_str}")
-    ]
+    ])
     
     for line_type, line in text_lines:
         if y < 30*mm:

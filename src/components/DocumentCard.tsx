@@ -182,6 +182,28 @@ const DocumentCard = ({
                         />
                       </div>
                     </div>
+                    {loanFormData.amount && loanFormData.term && (
+                      <div className="p-4 bg-blue-50 rounded-lg border-2 border-blue-200">
+                        <div className="grid grid-cols-2 gap-4 text-sm">
+                          <div>
+                            <span className="text-gray-600">Процентная ставка:</span>
+                            <p className="font-semibold text-gray-800">1% в день</p>
+                          </div>
+                          <div>
+                            <span className="text-gray-600">Проценты за период:</span>
+                            <p className="font-semibold text-gray-800">
+                              {(parseFloat(loanFormData.amount) * parseFloat(loanFormData.term) * 0.01).toLocaleString('ru-RU')} ₽
+                            </p>
+                          </div>
+                          <div className="col-span-2 pt-2 border-t border-blue-300">
+                            <span className="text-gray-600">Сумма к возврату:</span>
+                            <p className="text-xl font-bold text-primary">
+                              {(parseFloat(loanFormData.amount) * (1 + parseFloat(loanFormData.term) * 0.01)).toLocaleString('ru-RU')} ₽
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <Label htmlFor="loanPhone">Телефон</Label>
