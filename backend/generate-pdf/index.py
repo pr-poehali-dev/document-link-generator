@@ -1,7 +1,7 @@
 '''
-Business: Генерирует PDF документы с реквизитами самозанятого
+Business: Генерирует PDF документы с реквизитами самозанятого на русском языке
 Args: event с httpMethod и queryStringParameters (type: loan/consent/refund)
-Returns: PDF файл для скачивания
+Returns: PDF файл для скачивания с поддержкой кириллицы
 '''
 
 import json
@@ -11,68 +11,92 @@ from reportlab.pdfgen import canvas
 from reportlab.lib.units import mm
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
-from reportlab.lib.styles import getSampleStyleSheet
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
 from io import BytesIO
 import base64
+import urllib.request
+
+def register_fonts():
+    try:
+        url = "https://github.com/google/fonts/raw/main/ofl/opensans/OpenSans%5Bwdth%2Cwght%5D.ttf"
+        response = urllib.request.urlopen(url)
+        font_data = response.read()
+        
+        font_file = BytesIO(font_data)
+        pdfmetrics.registerFont(TTFont('OpenSans', font_file))
+        return True
+    except:
+        return False
 
 def create_loan_agreement() -> bytes:
     buffer = BytesIO()
     c = canvas.Canvas(buffer, pagesize=A4)
     width, height = A4
     
+    has_font = register_fonts()
+    font_name = 'OpenSans' if has_font else 'Helvetica'
+    
     y = height - 40*mm
     
-    c.setFont("Helvetica-Bold", 16)
-    c.drawCentredString(width/2, y, "DOGOVOR ZAJMA")
+    c.setFont(font_name, 16)
+    c.drawCentredString(width/2, y, "ДОГОВОР ЗАЙМА")
     y -= 15*mm
     
-    c.setFont("Helvetica", 11)
-    c.drawString(30*mm, y, "Moskva")
-    c.drawRightString(width - 30*mm, y, f"«__» __________ 20__ g.")
+    c.setFont(font_name, 11)
+    c.drawString(30*mm, y, "г. Москва")
+    c.drawRightString(width - 30*mm, y, "«__» __________ 20__ г.")
     y -= 10*mm
     
-    c.setFont("Helvetica", 10)
+    c.setFont(font_name, 10)
     
     text_lines = [
         "",
-        "Samozanyatyj Malik Stepan Vladimirovich, INN 503303222876,",
-        "imenuemyj v dal'nejshem «Zajmodavec», s odnoj storony, i",
-        "________________________________, imenuemyj v dal'nejshem «Zaemschik», s drugoj storony,",
-        "zaklyuchili nastoyaschij dogovor o nizhe sleduyuschem:",
+        "Самозанятый Малик Степан Владимирович, ИНН 503303222876,",
+        "именуемый в дальнейшем «Займодавец», с одной стороны, и",
+        "________________________________, именуемый в дальнейшем «Заемщик»,",
+        "с другой стороны, заключили настоящий договор о нижеследующем:",
         "",
-        "1. PREDMET DOGOVORA",
+        "1. ПРЕДМЕТ ДОГОВОРА",
         "",
-        "1.1. Zajmodavec peredaet v sobstvennost' Zaemschiku denezhnye sredstva",
-        "v summe _____________ rublej (zaem), a Zaemschik obyazuetsya vozvrativ",
-        "zaem i uplativ procenty na nego v sroke i v poryadke, kotorye predusmotreny",
-        "nastoyaschim dogovorom.",
+        "1.1. Займодавец передает в собственность Заемщику денежные средства",
+        "в сумме _____________ рублей (заем), а Заемщик обязуется вернуть",
+        "заем и уплатить проценты на него в сроке и в порядке, которые",
+        "предусмотрены настоящим договором.",
         "",
-        "2. USLOVIYA ZAJMA",
+        "2. УСЛОВИЯ ЗАЙМА",
         "",
-        "2.1. Summa zajma: _____________ rublej.",
-        "2.2. Srok vozvrta zajma: do «__» __________ 20__ g.",
-        "2.3. Procenty za pol'zovanie zajmom: ___% godovyh.",
+        "2.1. Сумма займа: _____________ рублей.",
+        "2.2. Срок возврата займа: до «__» __________ 20__ г.",
+        "2.3. Проценты за пользование займом: ___% годовых.",
         "",
-        "3. KONTAKTNYE DANNYE ZAJMODAVCA",
+        "3. КОНТАКТНЫЕ ДАННЫЕ ЗАЙМОДАВЦА",
         "",
-        "Adres: g. Moskva, ulica marshala Zhukova, dom 53, ofis 183",
-        "Telefon: +7 (499) 273-38-29",
-        "INN: 503303222876",
+        "Адрес: г. Москва, улица маршала Жукова, дом 53, офис 183",
+        "Телефон: +7 (499) 273-38-29",
+        "ИНН: 503303222876",
         "",
-        "4. PODPISI STORON",
+        "4. ПРАВА И ОБЯЗАННОСТИ СТОРОН",
         "",
-        "Zajmodavec: _________________ / Malik S.V. /",
+        "4.1. Займодавец обязуется передать сумму займа в срок,",
+        "указанный в п. 1.1 настоящего договора.",
         "",
-        "Zaemschik: _________________ / _____________ /"
+        "4.2. Заемщик обязуется:",
+        "- вернуть полученные денежные средства в установленный срок;",
+        "- уплатить проценты за пользование займом.",
+        "",
+        "5. ПОДПИСИ СТОРОН",
+        "",
+        "Займодавец: _________________ / Малик С.В. /",
+        "",
+        "Заемщик: _________________ / _____________ /"
     ]
     
     for line in text_lines:
-        c.drawString(30*mm, y, line)
-        y -= 5*mm
         if y < 30*mm:
             c.showPage()
             y = height - 40*mm
+            c.setFont(font_name, 10)
+        c.drawString(30*mm, y, line)
+        y -= 5*mm
     
     c.save()
     buffer.seek(0)
@@ -83,57 +107,63 @@ def create_consent_form() -> bytes:
     c = canvas.Canvas(buffer, pagesize=A4)
     width, height = A4
     
+    has_font = register_fonts()
+    font_name = 'OpenSans' if has_font else 'Helvetica'
+    
     y = height - 40*mm
     
-    c.setFont("Helvetica-Bold", 14)
-    c.drawCentredString(width/2, y, "SOGLASIE NA OBRABOTKU")
+    c.setFont(font_name, 14)
+    c.drawCentredString(width/2, y, "СОГЛАСИЕ НА ОБРАБОТКУ")
     y -= 7*mm
-    c.drawCentredString(width/2, y, "PERSONAL'NYH DANNYH")
+    c.drawCentredString(width/2, y, "ПЕРСОНАЛЬНЫХ ДАННЫХ")
     y -= 15*mm
     
-    c.setFont("Helvetica", 10)
+    c.setFont(font_name, 10)
     
     text_lines = [
-        "Ya, ________________________________________,",
+        "Я, ________________________________________,",
         "",
-        "v sootvetstvii s trebovaniyami st. 9 Federal'nogo zakona ot 27.07.2006",
-        "№ 152-FZ «O personal'nyh dannyh» dayu soglasie samozanyatomu",
-        "Malik Stepanu Vladimirovichu (INN 503303222876) na obrabotku moih",
-        "personal'nyh dannyh.",
+        "в соответствии с требованиями ст. 9 Федерального закона",
+        "от 27.07.2006 № 152-ФЗ «О персональных данных» даю согласие",
+        "самозанятому Малик Степану Владимировичу (ИНН 503303222876)",
+        "на обработку моих персональных данных.",
         "",
-        "Cel' obrabotki personal'nyh dannyh:",
-        "- zaklyuchenie i ispolnenie dogovorov",
-        "- vedenie buhgalterskogo i nalogovogo ucheta",
-        "- informirovanie o novyh uslugah",
+        "Цель обработки персональных данных:",
+        "- заключение и исполнение договоров",
+        "- ведение бухгалтерского и налогового учета",
+        "- информирование о новых услугах",
         "",
-        "Perechen' personal'nyh dannyh, na obrabotku kotoryh",
-        "daetsya soglasie:",
-        "- familiya, imya, otchestvo",
-        "- data rozhdeniya",
-        "- adres registracii i fakticheskogo prozhivaniya",
-        "- kontaktnye telefony",
-        "- adres elektronnoj pochty",
-        "- pasportnye dannye",
+        "Перечень персональных данных, на обработку которых",
+        "дается согласие:",
+        "- фамилия, имя, отчество",
+        "- дата рождения",
+        "- адрес регистрации и фактического проживания",
+        "- контактные телефоны",
+        "- адрес электронной почты",
+        "- паспортные данные",
         "",
-        "Soglasie daetsya na period dejstviya dogovornyh otnoshenij",
-        "i 5 (pyat') let posle ih okonchaniya.",
+        "Согласие дается на период действия договорных отношений",
+        "и 5 (пять) лет после их окончания.",
         "",
-        "Kontaktnye dannye operatora:",
-        "Adres: g. Moskva, ulica marshala Zhukova, dom 53, ofis 183",
-        "Telefon: +7 (499) 273-38-29",
+        "Контактные данные оператора:",
+        "ФИО: Малик Степан Владимирович",
+        "ИНН: 503303222876",
+        "Адрес: г. Москва, улица маршала Жукова, дом 53, офис 183",
+        "Телефон: +7 (499) 273-38-29",
         "",
         "",
-        "Data: «__» __________ 20__ g.",
+        "Дата: «__» __________ 20__ г.",
         "",
-        "Podpis': _________________ / _________________ /"
+        "Подпись: _________________ / _________________ /"
     ]
     
     for line in text_lines:
-        c.drawString(30*mm, y, line)
-        y -= 5*mm
         if y < 30*mm:
             c.showPage()
             y = height - 40*mm
+            c.setFont(font_name, 10)
+        c.drawString(30*mm, y, line)
+        y -= 5*mm
     
     c.save()
     buffer.seek(0)
@@ -144,62 +174,75 @@ def create_refund_policy() -> bytes:
     c = canvas.Canvas(buffer, pagesize=A4)
     width, height = A4
     
+    has_font = register_fonts()
+    font_name = 'OpenSans' if has_font else 'Helvetica'
+    
     y = height - 40*mm
     
-    c.setFont("Helvetica-Bold", 14)
-    c.drawCentredString(width/2, y, "PORYADOK VOZVRATA PLATEZHEJ")
+    c.setFont(font_name, 14)
+    c.drawCentredString(width/2, y, "ПОРЯДОК ВОЗВРАТА ПЛАТЕЖЕЙ")
     y -= 15*mm
     
-    c.setFont("Helvetica", 10)
+    c.setFont(font_name, 10)
     
     text_lines = [
-        "Samozanyatyj: Malik Stepan Vladimirovich",
-        "INN: 503303222876",
-        "Adres: g. Moskva, ulica marshala Zhukova, dom 53, ofis 183",
-        "Telefon: +7 (499) 273-38-29",
+        "Самозанятый: Малик Степан Владимирович",
+        "ИНН: 503303222876",
+        "Адрес: г. Москва, улица маршала Жукова, дом 53, офис 183",
+        "Телефон: +7 (499) 273-38-29",
         "",
-        "1. OSNOVANIE DLYA VOZVRATA",
+        "1. ОСНОВАНИЕ ДЛЯ ВОЗВРАТА",
         "",
-        "1.1. Vozvrat platezhej osuschestvlyaetsya v sleduyuschih sluchayah:",
-        "- oshibochnogo zachisleniya sredstv",
-        "- nenadlezhashchego ispolneniya obyazatel'stv",
-        "- v drugih sluchayah, predusmotrenyh zakonodatel'stvom RF",
+        "1.1. Возврат платежей осуществляется в следующих случаях:",
+        "- ошибочного зачисления средств",
+        "- ненадлежащего исполнения обязательств",
+        "- в других случаях, предусмотренных законодательством РФ",
         "",
-        "2. PORYADOK OFORMLENIYA VOZVRATA",
+        "2. ПОРЯДОК ОФОРМЛЕНИЯ ВОЗВРАТА",
         "",
-        "2.1. Dlya oformleniya vozvrata neobhodimo:",
-        "- napisat' zayavlenie na vozvrat s ukazaniem osnovania",
-        "- prilozhit' kopii podtverzhdayuschih dokumentov",
-        "- ukazat' rekvizity dlya perechisleniya sredstv",
+        "2.1. Для оформления возврата необходимо:",
+        "- написать заявление на возврат с указанием основания",
+        "- приложить копии подтверждающих документов",
+        "- указать реквизиты для перечисления средств",
         "",
-        "2.2. Zayavlenie mozhno podat':",
-        "- lichno po adresu: g. Moskva, ul. marshala Zhukova, d. 53, of. 183",
-        "- po telefonu: +7 (499) 273-38-29",
+        "2.2. Заявление можно подать:",
+        "- лично по адресу: г. Москва, ул. маршала Жукова, д. 53, оф. 183",
+        "- по телефону: +7 (499) 273-38-29",
         "",
-        "3. SROKI VOZVRATA",
+        "3. СРОКИ ВОЗВРАТА",
         "",
-        "3.1. Rassmotrenie zayavleniya: do 10 rabochih dnej",
-        "3.2. Perechislenie sredstv: do 10 rabochih dnej posle prinyatiya",
-        "polozitel'nogo resheniya",
+        "3.1. Рассмотрение заявления: до 10 рабочих дней",
+        "3.2. Перечисление средств: до 10 рабочих дней после принятия",
+        "положительного решения",
         "",
-        "4. SPOSOBY VOZVRATA",
+        "4. СПОСОБЫ ВОЗВРАТА",
         "",
-        "4.1. Vozvrat osuschestvlyaetsya tem zhe sposobom, kotorym byl",
-        "proveden platezh, esli inoe ne predusmotreno zakonodatel'stvom",
-        "ili soglasheniem storon.",
+        "4.1. Возврат осуществляется тем же способом, которым был",
+        "проведен платеж, если иное не предусмотрено законодательством",
+        "или соглашением сторон.",
         "",
-        "4.2. Po zhelaniyu zakazchika vozvrat mozhet byt' osuchshestschvlen",
-        "na bankovskij schet pri predostavlenii sootvetstvuyuschih rekvizitov.",
+        "4.2. По желанию заказчика возврат может быть осуществлен",
+        "на банковский счет при предоставлении соответствующих реквизитов.",
         "",
-        "Dannye usloviya deystvuyut s momenta publikacii i do ih izmeneniya."
+        "5. ОТВЕТСТВЕННОСТЬ СТОРОН",
+        "",
+        "5.1. За необоснованный отказ в возврате средств самозанятый",
+        "несет ответственность в соответствии с законодательством РФ.",
+        "",
+        "5.2. Заказчик несет ответственность за предоставление",
+        "недостоверной информации при оформлении заявления на возврат.",
+        "",
+        "",
+        "Данные условия действуют с момента публикации и до их изменения."
     ]
     
     for line in text_lines:
-        c.drawString(30*mm, y, line)
-        y -= 5*mm
         if y < 30*mm:
             c.showPage()
             y = height - 40*mm
+            c.setFont(font_name, 10)
+        c.drawString(30*mm, y, line)
+        y -= 5*mm
     
     c.save()
     buffer.seek(0)
@@ -252,8 +295,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         'statusCode': 200,
         'headers': {
             'Content-Type': 'application/pdf',
-            'Content-Disposition': f'attachment; filename="{filename}"',
-            'Access-Control-Allow-Origin': '*'
+            'Content-Disposition': f'inline; filename="{filename}"',
+            'Access-Control-Allow-Origin': '*',
+            'Cache-Control': 'no-cache'
         },
         'body': pdf_base64,
         'isBase64Encoded': True
