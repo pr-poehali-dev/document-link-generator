@@ -47,9 +47,14 @@ const Index = () => {
     setTimeout(() => setCopiedId(null), 2000);
   };
 
+  const handleView = (url: string) => {
+    window.open(url, '_blank', 'noopener,noreferrer');
+  };
+
   const handleDownload = (url: string) => {
     const link = document.createElement('a');
     link.href = url;
+    link.download = '';
     link.target = '_blank';
     link.rel = 'noopener noreferrer';
     document.body.appendChild(link);
@@ -100,8 +105,17 @@ const Index = () => {
 
                   <div className="flex flex-wrap gap-3">
                     <Button 
-                      onClick={() => handleDownload(doc.url)}
+                      onClick={() => handleView(doc.url)}
                       className="bg-primary hover:bg-primary/90 text-white gap-2"
+                    >
+                      <Icon name="Eye" size={18} />
+                      Просмотр
+                    </Button>
+                    
+                    <Button 
+                      onClick={() => handleDownload(doc.url)}
+                      variant="outline"
+                      className="gap-2 border-2 hover:bg-gray-50"
                     >
                       <Icon name="Download" size={18} />
                       Скачать
