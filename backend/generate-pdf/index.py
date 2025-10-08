@@ -78,64 +78,105 @@ def draw_signature(c, sig_data: str, x: float, y: float, max_width: float = 40*m
 def draw_header_decoration(c, width, height):
     from reportlab.lib.colors import HexColor
     blue_dark = HexColor('#1e40af')
+    blue_mid = HexColor('#2563eb')
     blue_light = HexColor('#3b82f6')
+    blue_lighter = HexColor('#60a5fa')
     blue_bg = HexColor('#eff6ff')
+    white = HexColor('#ffffff')
     
     c.setFillColor(blue_bg)
-    c.rect(0, height - 60*mm, width, 60*mm, fill=1, stroke=0)
+    c.rect(0, height - 70*mm, width, 70*mm, fill=1, stroke=0)
+    
+    num_circles = 15
+    for i in range(num_circles):
+        import random
+        random.seed(i + 100)
+        x = random.uniform(0, width)
+        y = height - random.uniform(10*mm, 60*mm)
+        size = random.uniform(2*mm, 8*mm)
+        opacity_colors = [blue_lighter, blue_light, blue_mid]
+        c.setFillColor(random.choice(opacity_colors))
+        c.circle(x, y, size, fill=1, stroke=0)
     
     c.setFillColor(blue_dark)
+    c.circle(width - 35*mm, height - 25*mm, 30*mm, fill=1, stroke=0)
+    
+    c.setFillColor(blue_mid)
     c.circle(width - 40*mm, height - 30*mm, 25*mm, fill=1, stroke=0)
     
     c.setFillColor(blue_light)
     c.circle(width - 45*mm, height - 35*mm, 20*mm, fill=1, stroke=0)
     
-    c.setStrokeColor(blue_light)
-    c.setLineWidth(2)
-    c.line(30*mm, height - 55*mm, width - 30*mm, height - 55*mm)
+    c.setStrokeColor(white)
+    c.setLineWidth(3)
+    for i in range(3):
+        y_pos = height - 32*mm - i*3*mm
+        c.line(width - 50*mm, y_pos, width - 30*mm, y_pos)
     
     c.setFillColor(blue_dark)
-    c.rect(25*mm, height - 50*mm, 8*mm, 8*mm, fill=1, stroke=0)
+    c.rect(25*mm, height - 55*mm, 10*mm, 10*mm, fill=1, stroke=0)
+    
     c.setFillColor(blue_light)
-    c.circle(33*mm, height - 42*mm, 3*mm, fill=1, stroke=0)
+    c.circle(30*mm, height - 50*mm, 4*mm, fill=1, stroke=0)
+    
+    c.setFillColor(white)
+    c.setFont('Helvetica-Bold', 16)
+    c.drawString(30*mm - 2*mm, height - 52*mm, '₽')
+    
+    c.setStrokeColor(blue_mid)
+    c.setLineWidth(2.5)
+    c.line(30*mm, height - 65*mm, width - 30*mm, height - 65*mm)
 
 def draw_document_icon(c, x, y):
     from reportlab.lib.colors import HexColor
     blue_dark = HexColor('#1e40af')
     blue_light = HexColor('#3b82f6')
+    blue_lighter = HexColor('#60a5fa')
+    gold = HexColor('#fbbf24')
+    white = HexColor('#ffffff')
+    
+    c.setFillColor(blue_lighter)
+    c.circle(x + 10*mm, y + 12*mm, 18*mm, fill=1, stroke=0)
     
     c.setStrokeColor(blue_dark)
+    c.setFillColor(white)
+    c.setLineWidth(2)
+    c.rect(x + 2*mm, y + 2*mm, 16*mm, 20*mm, fill=1, stroke=1)
+    
     c.setFillColor(blue_light)
-    c.setLineWidth(1.5)
+    c.rect(x + 4*mm, y + 16*mm, 12*mm, 2*mm, fill=1, stroke=0)
+    c.rect(x + 4*mm, y + 12*mm, 12*mm, 2*mm, fill=1, stroke=0)
+    c.rect(x + 4*mm, y + 8*mm, 8*mm, 2*mm, fill=1, stroke=0)
     
-    c.rect(x, y, 15*mm, 20*mm, fill=1, stroke=1)
+    c.setFillColor(gold)
+    c.circle(x + 15*mm, y + 20*mm, 3*mm, fill=1, stroke=0)
     
-    c.setStrokeColor(HexColor('#ffffff'))
-    c.setLineWidth(0.8)
-    c.line(x + 3*mm, y + 15*mm, x + 12*mm, y + 15*mm)
-    c.line(x + 3*mm, y + 11*mm, x + 12*mm, y + 11*mm)
-    c.line(x + 3*mm, y + 7*mm, x + 12*mm, y + 7*mm)
-    
-    c.setFillColor(HexColor('#fbbf24'))
-    c.circle(x + 12*mm, y + 18*mm, 2*mm, fill=1, stroke=0)
+    c.setFillColor(white)
+    c.setFont('Helvetica-Bold', 12)
+    c.drawString(x + 13*mm, y + 18*mm, '₽')
 
 def draw_shield_icon(c, x, y):
     from reportlab.lib.colors import HexColor
     blue_dark = HexColor('#1e40af')
     blue_light = HexColor('#3b82f6')
+    blue_lighter = HexColor('#60a5fa')
     green = HexColor('#10b981')
+    white = HexColor('#ffffff')
+    
+    c.setFillColor(blue_lighter)
+    c.circle(x + 10*mm, y + 12*mm, 18*mm, fill=1, stroke=0)
     
     c.setStrokeColor(blue_dark)
     c.setFillColor(blue_light)
-    c.setLineWidth(1.5)
+    c.setLineWidth(2)
     
     points = [
-        (x + 7.5*mm, y + 20*mm),
-        (x + 15*mm, y + 16*mm),
-        (x + 15*mm, y + 6*mm),
-        (x + 7.5*mm, y),
-        (x, y + 6*mm),
-        (x, y + 16*mm)
+        (x + 10*mm, y + 24*mm),
+        (x + 18*mm, y + 20*mm),
+        (x + 18*mm, y + 8*mm),
+        (x + 10*mm, y + 2*mm),
+        (x + 2*mm, y + 8*mm),
+        (x + 2*mm, y + 20*mm)
     ]
     
     path = c.beginPath()
@@ -145,31 +186,39 @@ def draw_shield_icon(c, x, y):
     path.close()
     c.drawPath(path, fill=1, stroke=1)
     
-    c.setFillColor(green)
-    c.setLineWidth(2)
-    c.setStrokeColor(HexColor('#ffffff'))
-    c.line(x + 3*mm, y + 10*mm, x + 6*mm, y + 7*mm)
-    c.line(x + 6*mm, y + 7*mm, x + 12*mm, y + 14*mm)
+    c.setFillColor(white)
+    c.setLineWidth(3)
+    c.setStrokeColor(white)
+    c.line(x + 5*mm, y + 12*mm, x + 8*mm, y + 9*mm)
+    c.line(x + 8*mm, y + 9*mm, x + 15*mm, y + 17*mm)
 
 def draw_money_icon(c, x, y):
     from reportlab.lib.colors import HexColor
     blue_dark = HexColor('#1e40af')
     blue_light = HexColor('#3b82f6')
+    blue_lighter = HexColor('#60a5fa')
     gold = HexColor('#fbbf24')
+    green = HexColor('#10b981')
+    white = HexColor('#ffffff')
+    
+    c.setFillColor(blue_lighter)
+    c.circle(x + 10*mm, y + 12*mm, 18*mm, fill=1, stroke=0)
     
     c.setStrokeColor(blue_dark)
-    c.setFillColor(gold)
-    c.setLineWidth(1.5)
+    c.setFillColor(green)
+    c.setLineWidth(2)
+    c.roundRect(x + 2*mm, y + 8*mm, 16*mm, 10*mm, 2*mm, fill=1, stroke=1)
     
-    c.rect(x, y + 8*mm, 15*mm, 10*mm, fill=1, stroke=1)
+    c.setFillColor(gold)
+    c.circle(x + 10*mm, y + 13*mm, 4*mm, fill=1, stroke=0)
+    
+    c.setFillColor(white)
+    c.setFont('Helvetica-Bold', 14)
+    c.drawString(x + 7.5*mm, y + 11*mm, '₽')
     
     c.setFillColor(blue_light)
-    c.circle(x + 7.5*mm, y + 13*mm, 3*mm, fill=1, stroke=0)
-    
-    c.setStrokeColor(HexColor('#ffffff'))
-    c.setLineWidth(1.2)
-    c.line(x + 7.5*mm, y + 15*mm, x + 7.5*mm, y + 11*mm)
-    c.line(x + 6*mm, y + 13*mm, x + 9*mm, y + 13*mm)
+    c.circle(x + 4*mm, y + 16*mm, 1.5*mm, fill=1, stroke=0)
+    c.circle(x + 16*mm, y + 10*mm, 1.5*mm, fill=1, stroke=0)
 
 def create_loan_agreement(logo: str = None, signature: str = None, client_data: Dict[str, str] = None) -> bytes:
     from reportlab.lib.colors import HexColor
@@ -189,12 +238,18 @@ def create_loan_agreement(logo: str = None, signature: str = None, client_data: 
     if logo:
         draw_logo(c, logo, width - 70*mm, height - 25*mm)
     else:
-        draw_document_icon(c, 35*mm, height - 45*mm)
+        draw_document_icon(c, 30*mm, height - 50*mm)
     
-    y = height - 25*mm
+    y = height - 30*mm
     c.setFillColor(blue_dark)
-    c.setFont(font_name, 20)
-    c.drawString(60*mm, y, "ДОГОВОР ЗАЙМА")
+    c.setFont(font_name, 24)
+    c.drawString(55*mm, y, "ДОГОВОР ЗАЙМА")
+    
+    from reportlab.lib.colors import HexColor
+    c.setFillColor(HexColor('#6b7280'))
+    c.setFont(font_name, 10)
+    y -= 6*mm
+    c.drawString(55*mm, y, "Официальный документ | Защищено законодательством РФ")
     
     from datetime import datetime
     current_date = datetime.now()
@@ -278,7 +333,9 @@ def create_loan_agreement(logo: str = None, signature: str = None, client_data: 
     if interest_amount and total_amount:
         text_lines.extend([
             ("normal", f"2.5. Сумма процентов за весь период: {interest_amount} рублей."),
-            ("normal", f"2.6. ИТОГО К ВОЗВРАТУ: {total_amount} рублей."),
+            ("space", ""),
+            ("highlight", f"💰 ИТОГО К ВОЗВРАТУ: {total_amount} рублей"),
+            ("space", ""),
         ])
     
     text_lines.extend([
@@ -318,6 +375,7 @@ def create_loan_agreement(logo: str = None, signature: str = None, client_data: 
     for line_type, line in text_lines:
         if y < 30*mm:
             c.showPage()
+            draw_header_decoration(c, width, height)
             y = height - 30*mm
         
         if line_type == "header":
@@ -327,6 +385,15 @@ def create_loan_agreement(logo: str = None, signature: str = None, client_data: 
             c.setFont(font_name, 10)
             c.setFillColor(gray_text)
             y -= 6*mm
+        elif line_type == "highlight":
+            c.setFillColor(HexColor('#10b981'))
+            c.roundRect(28*mm, y - 3*mm, width - 56*mm, 8*mm, 2*mm, fill=1, stroke=0)
+            c.setFillColor(HexColor('#ffffff'))
+            c.setFont(font_name, 12)
+            c.drawString(32*mm, y, line)
+            c.setFont(font_name, 10)
+            c.setFillColor(gray_text)
+            y -= 10*mm
         elif line_type == "contact":
             c.setFillColor(blue_dark)
             c.drawString(30*mm, y, line)
@@ -367,14 +434,20 @@ def create_consent_form(logo: str = None, signature: str = None, client_data: Di
     if logo:
         draw_logo(c, logo, width - 70*mm, height - 25*mm)
     else:
-        draw_shield_icon(c, 35*mm, height - 45*mm)
+        draw_shield_icon(c, 30*mm, height - 50*mm)
     
-    y = height - 25*mm
+    y = height - 30*mm
     c.setFillColor(blue_dark)
-    c.setFont(font_name, 18)
-    c.drawString(60*mm, y, "СОГЛАСИЕ НА ОБРАБОТКУ")
+    c.setFont(font_name, 20)
+    c.drawString(55*mm, y, "СОГЛАСИЕ НА ОБРАБОТКУ")
     y -= 7*mm
-    c.drawString(60*mm, y, "ПЕРСОНАЛЬНЫХ ДАННЫХ")
+    c.drawString(55*mm, y, "ПЕРСОНАЛЬНЫХ ДАННЫХ")
+    
+    from reportlab.lib.colors import HexColor
+    c.setFillColor(HexColor('#6b7280'))
+    c.setFont(font_name, 9)
+    y -= 5*mm
+    c.drawString(55*mm, y, "В соответствии с ФЗ-152 «О персональных данных»")
     
     y = height - 65*mm
     c.setFont(font_name, 10)
@@ -481,12 +554,18 @@ def create_refund_policy(logo: str = None, signature: str = None, client_data: D
     if logo:
         draw_logo(c, logo, width - 70*mm, height - 25*mm)
     else:
-        draw_money_icon(c, 35*mm, height - 45*mm)
+        draw_money_icon(c, 30*mm, height - 50*mm)
     
-    y = height - 25*mm
+    y = height - 30*mm
     c.setFillColor(blue_dark)
-    c.setFont(font_name, 20)
-    c.drawString(60*mm, y, "ВОЗВРАТ ПЛАТЕЖЕЙ")
+    c.setFont(font_name, 24)
+    c.drawString(55*mm, y, "ВОЗВРАТ ПЛАТЕЖЕЙ")
+    
+    from reportlab.lib.colors import HexColor
+    c.setFillColor(HexColor('#6b7280'))
+    c.setFont(font_name, 10)
+    y -= 6*mm
+    c.drawString(55*mm, y, "Политика возврата денежных средств")
     
     y = height - 65*mm
     c.setFont(font_name, 10)
