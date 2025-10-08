@@ -36,6 +36,7 @@ interface DocumentCardProps {
   onDownload: (url: string) => void;
   onCopyLink: (url: string, id: number) => void;
   onGenerateDocument: (docType: string) => void;
+  onSaveTemplate: (data: any, type: 'loan' | 'contact') => void;
   setOpenDialog: (type: string | null) => void;
   setLoanFormData: (data: any) => void;
   setContactFormData: (data: any) => void;
@@ -52,6 +53,7 @@ const DocumentCard = ({
   onDownload,
   onCopyLink,
   onGenerateDocument,
+  onSaveTemplate,
   setOpenDialog,
   setLoanFormData,
   setContactFormData,
@@ -236,7 +238,18 @@ const DocumentCard = ({
                     </div>
                   </div>
                 )}
-                <DialogFooter>
+                <DialogFooter className="flex-col gap-2">
+                  <Button 
+                    onClick={() => onSaveTemplate(
+                      doc.type === 'loan' ? loanFormData : contactFormData,
+                      doc.type === 'loan' ? 'loan' : 'contact'
+                    )} 
+                    variant="outline"
+                    className="w-full"
+                  >
+                    <Icon name="BookmarkPlus" size={18} className="mr-2" />
+                    Сохранить как шаблон
+                  </Button>
                   <Button onClick={() => onGenerateDocument(doc.type)} className="w-full bg-green-600 hover:bg-green-700">
                     <Icon name="FileDown" size={18} className="mr-2" />
                     Сформировать документ

@@ -3,6 +3,7 @@ import { useToast } from "@/hooks/use-toast";
 import DocumentCard from "@/components/DocumentCard";
 import LogoSignatureUpload from "@/components/LogoSignatureUpload";
 import CompanyInfo from "@/components/CompanyInfo";
+import TemplateManager from "@/components/TemplateManager";
 
 const BASE_URL = "https://functions.poehali.dev/502d518c-5d60-4ce9-a293-c916a64f50db";
 
@@ -200,6 +201,25 @@ const Index = () => {
     }
   };
 
+  const [templateToSave, setTemplateToSave] = useState<{data: any, type: 'loan' | 'contact'} | null>(null);
+
+  const handleSaveTemplate = (data: any, type: 'loan' | 'contact') => {
+    setTemplateToSave({ data, type });
+    toast({
+      title: "Данные готовы",
+      description: "Теперь нажмите 'Создать шаблон' ниже для сохранения",
+    });
+  };
+
+  const handleLoadTemplate = (template: any) => {
+    if (template.type === 'loan') {
+      setLoanFormData(template.data);
+      setOpenDialog('loan');
+    } else {
+      setContactFormData(template.data);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       <div className="container mx-auto px-4 py-12 max-w-5xl">
@@ -226,6 +246,7 @@ const Index = () => {
               onDownload={handleDownload}
               onCopyLink={handleCopyLink}
               onGenerateDocument={handleGenerateDocument}
+              onSaveTemplate={handleSaveTemplate}
               setOpenDialog={setOpenDialog}
               setLoanFormData={setLoanFormData}
               setContactFormData={setContactFormData}
@@ -234,6 +255,11 @@ const Index = () => {
         </div>
 
         <div className="mt-12">
+          <TemplateManager 
+            onLoadTemplate={handleLoadTemplate}
+            currentTemplateData={templateToSave}
+          />
+          
           <LogoSignatureUpload
             logo={logo}
             signature={signature}
