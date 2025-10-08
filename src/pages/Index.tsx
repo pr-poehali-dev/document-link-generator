@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button";
 import Icon from "@/components/ui/icon";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 const BASE_URL = "https://functions.poehali.dev/502d518c-5d60-4ce9-a293-c916a64f50db";
 
@@ -36,6 +38,8 @@ const documents = [
 const Index = () => {
   const { toast } = useToast();
   const [copiedId, setCopiedId] = useState<number | null>(null);
+  const [logo, setLogo] = useState<string | null>(null);
+  const [signature, setSignature] = useState<string | null>(null);
 
   const handleCopyLink = (url: string, id: number) => {
     navigator.clipboard.writeText(url);
@@ -52,14 +56,52 @@ const Index = () => {
   };
 
   const handleDownload = (url: string) => {
+    let finalUrl = url;
+    if (logo) {
+      finalUrl += `&logo=${encodeURIComponent(logo)}`;
+    }
+    if (signature) {
+      finalUrl += `&signature=${encodeURIComponent(signature)}`;
+    }
+    
     const link = document.createElement('a');
-    link.href = url;
+    link.href = finalUrl;
     link.download = '';
     link.target = '_blank';
     link.rel = 'noopener noreferrer';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+  };
+
+  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setLogo(reader.result as string);
+        toast({
+          title: "Логотип загружен",
+          description: "Логотип будет добавлен в документы",
+        });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleSignatureUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setSignature(reader.result as string);
+        toast({
+          title: "Подпись загружена",
+          description: "Подпись будет добавлена в документы",
+        });
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   return (
@@ -141,6 +183,80 @@ const Index = () => {
         </div>
 
         <div className="mt-12">
+          <Card className="p-6 bg-white border-2 mb-6">
+            <h3 className="text-xl font-semibold text-gray-800 mb-6 flex items-center gap-2">
+              <Icon name="Image" size={24} className="text-primary" />
+              Персонализация документов
+            </h3>
+            <div className="grid md:grid-cols-2 gap-6">
+              <div>
+                <Label htmlFor="logo" className="text-sm font-medium mb-2 block">
+                  Загрузить логотип
+                </Label>
+                <div className="space-y-3">
+                  <Input
+                    id="logo"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleLogoUpload}
+                    className="cursor-pointer"
+                  />
+                  {logo && (
+                    <div className="flex items-center gap-2 p-3 bg-green-50 rounded-md border border-green-200">
+                      <Icon name="CheckCircle" size={20} className="text-green-600" />
+                      <span className="text-sm text-green-700">Логотип загружен</span>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => setLogo(null)}
+                        className="ml-auto"
+                      >
+                        <Icon name="X" size={16} />
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </div>
+              
+              <div>
+                <Label htmlFor="signature" className="text-sm font-medium mb-2 block">
+                  Загрузить электронную подпись
+                </Label>
+                <div className="space-y-3">
+                  <Input
+                    id="signature"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleSignatureUpload}
+                    className="cursor-pointer"
+                  />
+                  {signature && (
+                    <div className="flex items-center gap-2 p-3 bg-green-50 rounded-md border border-green-200">
+                      <Icon name="CheckCircle" size={20} className="text-green-600" />
+                      <span className="text-sm text-green-700">Подпись загружена</span>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => setSignature(null)}
+                        className="ml-auto"
+                      >
+                        <Icon name="X" size={16} />
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+            <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+              <div className="flex gap-2">
+                <Icon name="Info" size={20} className="text-blue-600 flex-shrink-0" />
+                <p className="text-sm text-blue-700">
+                  Загруженные изображения будут автоматически добавлены в документы при просмотре или скачивании
+                </p>
+              </div>
+            </div>
+          </Card>
+          
           <Card className="p-6 bg-white border-2">
             <div className="grid md:grid-cols-2 gap-6">
               <div>

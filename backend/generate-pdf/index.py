@@ -27,6 +27,54 @@ def register_fonts():
     except:
         return False
 
+def draw_logo(c, logo_data: str, x: float, y: float, max_width: float = 30*mm, max_height: float = 15*mm):
+    try:
+        from reportlab.lib.utils import ImageReader
+        if logo_data.startswith('data:image'):
+            logo_data = logo_data.split(',')[1]
+        
+        img_bytes = base64.b64decode(logo_data)
+        img = ImageReader(BytesIO(img_bytes))
+        
+        iw, ih = img.getSize()
+        aspect = ih / float(iw)
+        
+        if iw > max_width / (1/72*25.4):
+            iw = max_width / (1/72*25.4)
+            ih = iw * aspect
+        
+        if ih > max_height / (1/72*25.4):
+            ih = max_height / (1/72*25.4)
+            iw = ih / aspect
+        
+        c.drawImage(img, x, y, width=iw*72/25.4*mm, height=ih*72/25.4*mm, mask='auto')
+    except:
+        pass
+
+def draw_signature(c, sig_data: str, x: float, y: float, max_width: float = 40*mm, max_height: float = 15*mm):
+    try:
+        from reportlab.lib.utils import ImageReader
+        if sig_data.startswith('data:image'):
+            sig_data = sig_data.split(',')[1]
+        
+        img_bytes = base64.b64decode(sig_data)
+        img = ImageReader(BytesIO(img_bytes))
+        
+        iw, ih = img.getSize()
+        aspect = ih / float(iw)
+        
+        if iw > max_width / (1/72*25.4):
+            iw = max_width / (1/72*25.4)
+            ih = iw * aspect
+        
+        if ih > max_height / (1/72*25.4):
+            ih = max_height / (1/72*25.4)
+            iw = ih / aspect
+        
+        c.drawImage(img, x, y, width=iw*72/25.4*mm, height=ih*72/25.4*mm, mask='auto')
+    except:
+        pass
+
 def draw_header_decoration(c, width, height):
     from reportlab.lib.colors import HexColor
     blue_dark = HexColor('#1e40af')
@@ -123,7 +171,7 @@ def draw_money_icon(c, x, y):
     c.line(x + 7.5*mm, y + 15*mm, x + 7.5*mm, y + 11*mm)
     c.line(x + 6*mm, y + 13*mm, x + 9*mm, y + 13*mm)
 
-def create_loan_agreement() -> bytes:
+def create_loan_agreement(logo: str = None, signature: str = None) -> bytes:
     from reportlab.lib.colors import HexColor
     buffer = BytesIO()
     c = canvas.Canvas(buffer, pagesize=A4)
@@ -138,7 +186,10 @@ def create_loan_agreement() -> bytes:
     
     draw_header_decoration(c, width, height)
     
-    draw_document_icon(c, 35*mm, height - 45*mm)
+    if logo:
+        draw_logo(c, logo, width - 70*mm, height - 25*mm)
+    else:
+        draw_document_icon(c, 35*mm, height - 45*mm)
     
     y = height - 25*mm
     c.setFillColor(blue_dark)
@@ -191,7 +242,7 @@ def create_loan_agreement() -> bytes:
         ("space", ""),
         ("header", "5. ПОДПИСИ СТОРОН"),
         ("space", ""),
-        ("normal", "Займодавец: _________________ / Малик С.В. /"),
+        ("normal", "Займодавец: " + ("" if signature else "_________________") + " / Малик С.В. /"),
         ("space", ""),
         ("normal", "Заемщик: _________________ / _____________ /")
     ]
@@ -223,11 +274,14 @@ def create_loan_agreement() -> bytes:
     c.setLineWidth(1)
     c.line(30*mm, 25*mm, width - 30*mm, 25*mm)
     
+    if signature:
+        draw_signature(c, signature, 45*mm, 32*mm)
+    
     c.save()
     buffer.seek(0)
     return buffer.getvalue()
 
-def create_consent_form() -> bytes:
+def create_consent_form(logo: str = None, signature: str = None) -> bytes:
     from reportlab.lib.colors import HexColor
     buffer = BytesIO()
     c = canvas.Canvas(buffer, pagesize=A4)
@@ -241,7 +295,11 @@ def create_consent_form() -> bytes:
     gray_text = HexColor('#374151')
     
     draw_header_decoration(c, width, height)
-    draw_shield_icon(c, 35*mm, height - 45*mm)
+    
+    if logo:
+        draw_logo(c, logo, width - 70*mm, height - 25*mm)
+    else:
+        draw_shield_icon(c, 35*mm, height - 45*mm)
     
     y = height - 25*mm
     c.setFillColor(blue_dark)
@@ -287,7 +345,7 @@ def create_consent_form() -> bytes:
         ("space", ""),
         ("normal", "Дата: «__» __________ 20__ г."),
         ("space", ""),
-        ("normal", "Подпись: _________________ / _________________ /")
+        ("normal", "Подпись: " + ("" if signature else "_________________") + " / _________________ /")
     ]
     
     for line_type, line in text_lines:
@@ -317,11 +375,14 @@ def create_consent_form() -> bytes:
     c.setLineWidth(1)
     c.line(30*mm, 25*mm, width - 30*mm, 25*mm)
     
+    if signature:
+        draw_signature(c, signature, 45*mm, 32*mm)
+    
     c.save()
     buffer.seek(0)
     return buffer.getvalue()
 
-def create_refund_policy() -> bytes:
+def create_refund_policy(logo: str = None, signature: str = None) -> bytes:
     from reportlab.lib.colors import HexColor
     buffer = BytesIO()
     c = canvas.Canvas(buffer, pagesize=A4)
@@ -335,7 +396,11 @@ def create_refund_policy() -> bytes:
     gray_text = HexColor('#374151')
     
     draw_header_decoration(c, width, height)
-    draw_money_icon(c, 35*mm, height - 45*mm)
+    
+    if logo:
+        draw_logo(c, logo, width - 70*mm, height - 25*mm)
+    else:
+        draw_money_icon(c, 35*mm, height - 45*mm)
     
     y = height - 25*mm
     c.setFillColor(blue_dark)
@@ -424,6 +489,9 @@ def create_refund_policy() -> bytes:
     c.setLineWidth(1)
     c.line(30*mm, 25*mm, width - 30*mm, 25*mm)
     
+    if signature:
+        draw_signature(c, signature, 45*mm, 32*mm)
+    
     c.save()
     buffer.seek(0)
     return buffer.getvalue()
@@ -452,15 +520,17 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     
     params = event.get('queryStringParameters', {})
     doc_type = params.get('type', 'loan')
+    logo = params.get('logo')
+    signature = params.get('signature')
     
     if doc_type == 'loan':
-        pdf_content = create_loan_agreement()
+        pdf_content = create_loan_agreement(logo, signature)
         filename = 'dogovor-zajma.pdf'
     elif doc_type == 'consent':
-        pdf_content = create_consent_form()
+        pdf_content = create_consent_form(logo, signature)
         filename = 'soglasie-na-obrabotku-dannyh.pdf'
     elif doc_type == 'refund':
-        pdf_content = create_refund_policy()
+        pdf_content = create_refund_policy(logo, signature)
         filename = 'vozvrat-platezhej.pdf'
     else:
         return {
