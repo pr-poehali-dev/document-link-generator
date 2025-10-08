@@ -171,7 +171,7 @@ def draw_money_icon(c, x, y):
     c.line(x + 7.5*mm, y + 15*mm, x + 7.5*mm, y + 11*mm)
     c.line(x + 6*mm, y + 13*mm, x + 9*mm, y + 13*mm)
 
-def create_loan_agreement(logo: str = None, signature: str = None) -> bytes:
+def create_loan_agreement(logo: str = None, signature: str = None, client_data: Dict[str, str] = None) -> bytes:
     from reportlab.lib.colors import HexColor
     buffer = BytesIO()
     c = canvas.Canvas(buffer, pagesize=A4)
@@ -206,24 +206,51 @@ def create_loan_agreement(logo: str = None, signature: str = None) -> bytes:
     c.setFont(font_name, 10)
     c.setFillColor(gray_text)
     
+    if not client_data:
+        client_data = {}
+    
+    full_name = client_data.get('fullName', '________________________________')
+    birth_date = client_data.get('birthDate', '__.__.____ г.р.')
+    if birth_date and birth_date != '__.__.____ г.р.' and '-' in birth_date:
+        parts = birth_date.split('-')
+        birth_date = f"{parts[2]}.{parts[1]}.{parts[0]} г.р."
+    
+    passport = f"{client_data.get('passportSeries', '____')} {client_data.get('passportNumber', '______')}"
+    amount = client_data.get('amount', '_____________')
+    term = client_data.get('term', '__')
+    phone = client_data.get('phone', '_________________')
+    email = client_data.get('email', '_________________')
+    
+    from datetime import datetime, timedelta
+    if term and term != '__':
+        try:
+            return_date = datetime.now() + timedelta(days=int(term))
+            return_date_str = return_date.strftime('%d.%m.%Y')
+        except:
+            return_date_str = '«__» __________ 20__ г.'
+    else:
+        return_date_str = '«__» __________ 20__ г.'
+    
     text_lines = [
         ("normal", "Самозанятый Малик Степан Владимирович, ИНН 503303222876,"),
         ("normal", "именуемый в дальнейшем «Займодавец», с одной стороны, и"),
-        ("normal", "________________________________, именуемый в дальнейшем «Заемщик»,"),
+        ("normal", f"{full_name}, именуемый в дальнейшем «Заемщик»,"),
+        ("normal", f"паспорт {passport}, дата рождения {birth_date},"),
         ("normal", "с другой стороны, заключили настоящий договор о нижеследующем:"),
         ("space", ""),
         ("header", "1. ПРЕДМЕТ ДОГОВОРА"),
         ("space", ""),
         ("normal", "1.1. Займодавец передает в собственность Заемщику денежные средства"),
-        ("normal", "в сумме _____________ рублей (заем), а Заемщик обязуется вернуть"),
+        ("normal", f"в сумме {amount} рублей (заем), а Заемщик обязуется вернуть"),
         ("normal", "заем и уплатить проценты на него в сроке и в порядке, которые"),
         ("normal", "предусмотрены настоящим договором."),
         ("space", ""),
         ("header", "2. УСЛОВИЯ ЗАЙМА"),
         ("space", ""),
-        ("normal", "2.1. Сумма займа: _____________ рублей."),
-        ("normal", "2.2. Срок возврата займа: до «__» __________ 20__ г."),
-        ("normal", "2.3. Проценты за пользование займом: ___% годовых."),
+        ("normal", f"2.1. Сумма займа: {amount} рублей."),
+        ("normal", f"2.2. Срок возврата займа: до {return_date_str}."),
+        ("normal", f"2.3. Срок займа: {term} дней."),
+        ("normal", "2.4. Проценты за пользование займом: 0% годовых."),
         ("space", ""),
         ("header", "3. КОНТАКТНЫЕ ДАННЫЕ ЗАЙМОДАВЦА"),
         ("space", ""),
@@ -231,20 +258,28 @@ def create_loan_agreement(logo: str = None, signature: str = None) -> bytes:
         ("contact", "Телефон: +7 (499) 273-38-29"),
         ("contact", "ИНН: 503303222876"),
         ("space", ""),
-        ("header", "4. ПРАВА И ОБЯЗАННОСТИ СТОРОН"),
+        ("header", "4. КОНТАКТНЫЕ ДАННЫЕ ЗАЕМЩИКА"),
         ("space", ""),
-        ("normal", "4.1. Займодавец обязуется передать сумму займа в срок,"),
+        ("contact", f"ФИО: {full_name}"),
+        ("contact", f"Паспорт: {passport}"),
+        ("contact", f"Дата рождения: {birth_date}"),
+        ("contact", f"Телефон: {phone}"),
+        ("contact", f"Email: {email}"),
+        ("space", ""),
+        ("header", "5. ПРАВА И ОБЯЗАННОСТИ СТОРОН"),
+        ("space", ""),
+        ("normal", "5.1. Займодавец обязуется передать сумму займа в срок,"),
         ("normal", "указанный в п. 1.1 настоящего договора."),
         ("space", ""),
-        ("normal", "4.2. Заемщик обязуется:"),
+        ("normal", "5.2. Заемщик обязуется:"),
         ("normal", "  • вернуть полученные денежные средства в установленный срок;"),
         ("normal", "  • уплатить проценты за пользование займом."),
         ("space", ""),
-        ("header", "5. ПОДПИСИ СТОРОН"),
+        ("header", "6. ПОДПИСИ СТОРОН"),
         ("space", ""),
         ("normal", "Займодавец: " + ("" if signature else "_________________") + " / Малик С.В. /"),
         ("space", ""),
-        ("normal", "Заемщик: _________________ / _____________ /")
+        ("normal", f"Заемщик: _________________ / {full_name} /")
     ]
     
     for line_type, line in text_lines:
@@ -281,7 +316,7 @@ def create_loan_agreement(logo: str = None, signature: str = None) -> bytes:
     buffer.seek(0)
     return buffer.getvalue()
 
-def create_consent_form(logo: str = None, signature: str = None) -> bytes:
+def create_consent_form(logo: str = None, signature: str = None, client_data: Dict[str, str] = None) -> bytes:
     from reportlab.lib.colors import HexColor
     buffer = BytesIO()
     c = canvas.Canvas(buffer, pagesize=A4)
@@ -312,8 +347,18 @@ def create_consent_form(logo: str = None, signature: str = None) -> bytes:
     c.setFont(font_name, 10)
     c.setFillColor(gray_text)
     
+    if not client_data:
+        client_data = {}
+    
+    full_name = client_data.get('fullName', '________________________________________')
+    phone = client_data.get('phone', '_________________')
+    email = client_data.get('email', '_________________')
+    
+    from datetime import datetime
+    current_date = datetime.now().strftime('%d.%m.%Y')
+    
     text_lines = [
-        ("normal", "Я, ________________________________________,"),
+        ("normal", f"Я, {full_name},"),
         ("space", ""),
         ("normal", "в соответствии с требованиями ст. 9 Федерального закона"),
         ("normal", "от 27.07.2006 № 152-ФЗ «О персональных данных» даю согласие"),
@@ -342,10 +387,13 @@ def create_consent_form(logo: str = None, signature: str = None) -> bytes:
         ("contact", "Адрес: г. Москва, улица маршала Жукова, дом 53, офис 183"),
         ("contact", "Телефон: +7 (499) 273-38-29"),
         ("space", ""),
+        ("header", "Мои контактные данные:"),
+        ("contact", f"Телефон: {phone}"),
+        ("contact", f"Email: {email}"),
         ("space", ""),
-        ("normal", "Дата: «__» __________ 20__ г."),
+        ("normal", f"Дата: {current_date}"),
         ("space", ""),
-        ("normal", "Подпись: " + ("" if signature else "_________________") + " / _________________ /")
+        ("normal", "Подпись: " + ("" if signature else "_________________") + f" / {full_name} /")
     ]
     
     for line_type, line in text_lines:
@@ -382,7 +430,7 @@ def create_consent_form(logo: str = None, signature: str = None) -> bytes:
     buffer.seek(0)
     return buffer.getvalue()
 
-def create_refund_policy(logo: str = None, signature: str = None) -> bytes:
+def create_refund_policy(logo: str = None, signature: str = None, client_data: Dict[str, str] = None) -> bytes:
     from reportlab.lib.colors import HexColor
     buffer = BytesIO()
     c = canvas.Canvas(buffer, pagesize=A4)
@@ -411,11 +459,30 @@ def create_refund_policy(logo: str = None, signature: str = None) -> bytes:
     c.setFont(font_name, 10)
     c.setFillColor(gray_text)
     
+    if not client_data:
+        client_data = {}
+    
+    full_name = client_data.get('fullName', '')
+    phone = client_data.get('phone', '')
+    email = client_data.get('email', '')
+    
     text_lines = [
         ("contact", "Самозанятый: Малик Степан Владимирович"),
         ("contact", "ИНН: 503303222876"),
         ("contact", "Адрес: г. Москва, улица маршала Жукова, дом 53, офис 183"),
         ("contact", "Телефон: +7 (499) 273-38-29"),
+        ("space", ""),
+    ]
+    
+    if full_name:
+        text_lines.extend([
+            ("header", "ДАННЫЕ КЛИЕНТА:"),
+            ("contact", f"ФИО: {full_name}"),
+            ("contact", f"Телефон: {phone}"),
+            ("contact", f"Email: {email}"),
+        ])
+    
+    text_lines.extend([
         ("space", ""),
         ("header", "1. ОСНОВАНИЕ ДЛЯ ВОЗВРАТА"),
         ("space", ""),
@@ -460,7 +527,7 @@ def create_refund_policy(logo: str = None, signature: str = None) -> bytes:
         ("space", ""),
         ("space", ""),
         ("normal", "Данные условия действуют с момента публикации и до их изменения.")
-    ]
+    ])
     
     for line_type, line in text_lines:
         if y < 30*mm:
@@ -523,14 +590,25 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     logo = params.get('logo')
     signature = params.get('signature')
     
+    client_data = {
+        'fullName': params.get('fullName', ''),
+        'birthDate': params.get('birthDate', ''),
+        'passportSeries': params.get('passportSeries', ''),
+        'passportNumber': params.get('passportNumber', ''),
+        'amount': params.get('amount', ''),
+        'term': params.get('term', ''),
+        'phone': params.get('phone', ''),
+        'email': params.get('email', '')
+    }
+    
     if doc_type == 'loan':
-        pdf_content = create_loan_agreement(logo, signature)
+        pdf_content = create_loan_agreement(logo, signature, client_data)
         filename = 'dogovor-zajma.pdf'
     elif doc_type == 'consent':
-        pdf_content = create_consent_form(logo, signature)
+        pdf_content = create_consent_form(logo, signature, client_data)
         filename = 'soglasie-na-obrabotku-dannyh.pdf'
     elif doc_type == 'refund':
-        pdf_content = create_refund_policy(logo, signature)
+        pdf_content = create_refund_policy(logo, signature, client_data)
         filename = 'vozvrat-platezhej.pdf'
     else:
         return {
