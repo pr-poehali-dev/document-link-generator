@@ -196,11 +196,20 @@ def create_loan_agreement(logo: str = None, signature: str = None, client_data: 
     c.setFont(font_name, 20)
     c.drawString(60*mm, y, "ДОГОВОР ЗАЙМА")
     
+    from datetime import datetime
+    current_date = datetime.now()
+    date_str = current_date.strftime('%d.%m.%Y')
+    day = current_date.strftime('%d')
+    month_names = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 
+                   'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря']
+    month = month_names[current_date.month - 1]
+    year = current_date.strftime('%Y')
+    
     y = height - 65*mm
     c.setFillColor(gray_text)
     c.setFont(font_name, 11)
     c.drawString(30*mm, y, "г. Москва")
-    c.drawRightString(width - 30*mm, y, "«__» __________ 20__ г.")
+    c.drawRightString(width - 30*mm, y, f"«{day}» {month} {year} г.")
     y -= 15*mm
     
     c.setFont(font_name, 10)
@@ -278,8 +287,10 @@ def create_loan_agreement(logo: str = None, signature: str = None, client_data: 
         ("header", "6. ПОДПИСИ СТОРОН"),
         ("space", ""),
         ("normal", "Займодавец: " + ("" if signature else "_________________") + " / Малик С.В. /"),
+        ("normal", f"Дата подписания: {date_str}"),
         ("space", ""),
-        ("normal", f"Заемщик: _________________ / {full_name} /")
+        ("normal", f"Заемщик: _________________ / {full_name} /"),
+        ("normal", f"Дата подписания: {date_str}")
     ]
     
     for line_type, line in text_lines:
