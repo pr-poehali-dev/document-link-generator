@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 
 const BASE_URL = "https://functions.poehali.dev/502d518c-5d60-4ce9-a293-c916a64f50db";
 
@@ -35,11 +36,44 @@ const documents = [
   }
 ];
 
+interface LoanFormData {
+  fullName: string;
+  birthDate: string;
+  passportSeries: string;
+  passportNumber: string;
+  amount: string;
+  term: string;
+  phone: string;
+  email: string;
+}
+
+interface ContactFormData {
+  phone: string;
+  email: string;
+  fullName: string;
+}
+
 const Index = () => {
   const { toast } = useToast();
   const [copiedId, setCopiedId] = useState<number | null>(null);
   const [logo, setLogo] = useState<string | null>(null);
   const [signature, setSignature] = useState<string | null>(null);
+  const [openDialog, setOpenDialog] = useState<string | null>(null);
+  const [loanFormData, setLoanFormData] = useState<LoanFormData>({
+    fullName: '',
+    birthDate: '',
+    passportSeries: '',
+    passportNumber: '',
+    amount: '',
+    term: '',
+    phone: '',
+    email: ''
+  });
+  const [contactFormData, setContactFormData] = useState<ContactFormData>({
+    phone: '',
+    email: '',
+    fullName: ''
+  });
 
   const handleCopyLink = (url: string, id: number) => {
     navigator.clipboard.writeText(url);
@@ -72,6 +106,72 @@ const Index = () => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+  };
+
+  const handleGenerateDocument = (docType: string) => {
+    const isLoan = docType === 'loan';
+    const formData = isLoan ? loanFormData : contactFormData;
+    
+    if (isLoan) {
+      if (!loanFormData.fullName || !loanFormData.birthDate || !loanFormData.passportSeries || 
+          !loanFormData.passportNumber || !loanFormData.amount || !loanFormData.term || 
+          !loanFormData.phone || !loanFormData.email) {
+        toast({
+          title: "Ошибка",
+          description: "Заполните все поля формы",
+          variant: "destructive"
+        });
+        return;
+      }
+    } else {
+      if (!contactFormData.phone || !contactFormData.email || !contactFormData.fullName) {
+        toast({
+          title: "Ошибка",
+          description: "Заполните все поля формы",
+          variant: "destructive"
+        });
+        return;
+      }
+    }
+
+    let url = `${BASE_URL}?type=${docType}`;
+    
+    if (isLoan) {
+      url += `&fullName=${encodeURIComponent(loanFormData.fullName)}`;
+      url += `&birthDate=${encodeURIComponent(loanFormData.birthDate)}`;
+      url += `&passportSeries=${encodeURIComponent(loanFormData.passportSeries)}`;
+      url += `&passportNumber=${encodeURIComponent(loanFormData.passportNumber)}`;
+      url += `&amount=${encodeURIComponent(loanFormData.amount)}`;
+      url += `&term=${encodeURIComponent(loanFormData.term)}`;
+      url += `&phone=${encodeURIComponent(loanFormData.phone)}`;
+      url += `&email=${encodeURIComponent(loanFormData.email)}`;
+    } else {
+      url += `&phone=${encodeURIComponent(contactFormData.phone)}`;
+      url += `&email=${encodeURIComponent(contactFormData.email)}`;
+      url += `&fullName=${encodeURIComponent(contactFormData.fullName)}`;
+    }
+    
+    if (logo) {
+      url += `&logo=${encodeURIComponent(logo)}`;
+    }
+    if (signature) {
+      url += `&signature=${encodeURIComponent(signature)}`;
+    }
+
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = '';
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    setOpenDialog(null);
+    toast({
+      title: "Документ сформирован",
+      description: "PDF файл готов к скачиванию"
+    });
   };
 
   const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -162,6 +262,150 @@ const Index = () => {
                       <Icon name="Download" size={18} />
                       Скачать
                     </Button>
+
+                    <Dialog open={openDialog === doc.type} onOpenChange={(open) => setOpenDialog(open ? doc.type : null)}>
+                      <DialogTrigger asChild>
+                        <Button 
+                          className="gap-2 bg-green-600 hover:bg-green-700 text-white"
+                        >
+                          <Icon name="FileEdit" size={18} />
+                          Заполнить и отправить
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                        <DialogHeader>
+                          <DialogTitle>Заполнение данных для {doc.title.toLowerCase()}</DialogTitle>
+                        </DialogHeader>
+                        {doc.type === 'loan' ? (
+                          <div className="grid gap-4 py-4">
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <Label htmlFor="fullName">ФИО клиента</Label>
+                                <Input 
+                                  id="fullName" 
+                                  value={loanFormData.fullName}
+                                  onChange={(e) => setLoanFormData({...loanFormData, fullName: e.target.value})}
+                                  placeholder="Иванов Иван Иванович"
+                                />
+                              </div>
+                              <div>
+                                <Label htmlFor="birthDate">Дата рождения</Label>
+                                <Input 
+                                  id="birthDate" 
+                                  type="date"
+                                  value={loanFormData.birthDate}
+                                  onChange={(e) => setLoanFormData({...loanFormData, birthDate: e.target.value})}
+                                />
+                              </div>
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <Label htmlFor="passportSeries">Серия паспорта</Label>
+                                <Input 
+                                  id="passportSeries" 
+                                  value={loanFormData.passportSeries}
+                                  onChange={(e) => setLoanFormData({...loanFormData, passportSeries: e.target.value})}
+                                  placeholder="1234"
+                                  maxLength={4}
+                                />
+                              </div>
+                              <div>
+                                <Label htmlFor="passportNumber">Номер паспорта</Label>
+                                <Input 
+                                  id="passportNumber" 
+                                  value={loanFormData.passportNumber}
+                                  onChange={(e) => setLoanFormData({...loanFormData, passportNumber: e.target.value})}
+                                  placeholder="567890"
+                                  maxLength={6}
+                                />
+                              </div>
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <Label htmlFor="amount">Сумма займа (руб.)</Label>
+                                <Input 
+                                  id="amount" 
+                                  type="number"
+                                  value={loanFormData.amount}
+                                  onChange={(e) => setLoanFormData({...loanFormData, amount: e.target.value})}
+                                  placeholder="50000"
+                                />
+                              </div>
+                              <div>
+                                <Label htmlFor="term">Срок займа (дней)</Label>
+                                <Input 
+                                  id="term" 
+                                  type="number"
+                                  value={loanFormData.term}
+                                  onChange={(e) => setLoanFormData({...loanFormData, term: e.target.value})}
+                                  placeholder="30"
+                                />
+                              </div>
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <Label htmlFor="loanPhone">Телефон</Label>
+                                <Input 
+                                  id="loanPhone" 
+                                  type="tel"
+                                  value={loanFormData.phone}
+                                  onChange={(e) => setLoanFormData({...loanFormData, phone: e.target.value})}
+                                  placeholder="+7 (999) 123-45-67"
+                                />
+                              </div>
+                              <div>
+                                <Label htmlFor="loanEmail">Email</Label>
+                                <Input 
+                                  id="loanEmail" 
+                                  type="email"
+                                  value={loanFormData.email}
+                                  onChange={(e) => setLoanFormData({...loanFormData, email: e.target.value})}
+                                  placeholder="client@example.com"
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="grid gap-4 py-4">
+                            <div>
+                              <Label htmlFor="contactFullName">ФИО клиента</Label>
+                              <Input 
+                                id="contactFullName" 
+                                value={contactFormData.fullName}
+                                onChange={(e) => setContactFormData({...contactFormData, fullName: e.target.value})}
+                                placeholder="Иванов Иван Иванович"
+                              />
+                            </div>
+                            <div>
+                              <Label htmlFor="contactPhone">Телефон</Label>
+                              <Input 
+                                id="contactPhone" 
+                                type="tel"
+                                value={contactFormData.phone}
+                                onChange={(e) => setContactFormData({...contactFormData, phone: e.target.value})}
+                                placeholder="+7 (999) 123-45-67"
+                              />
+                            </div>
+                            <div>
+                              <Label htmlFor="contactEmail">Email</Label>
+                              <Input 
+                                id="contactEmail" 
+                                type="email"
+                                value={contactFormData.email}
+                                onChange={(e) => setContactFormData({...contactFormData, email: e.target.value})}
+                                placeholder="client@example.com"
+                              />
+                            </div>
+                          </div>
+                        )}
+                        <DialogFooter>
+                          <Button onClick={() => handleGenerateDocument(doc.type)} className="w-full bg-green-600 hover:bg-green-700">
+                            <Icon name="FileDown" size={18} className="mr-2" />
+                            Сформировать документ
+                          </Button>
+                        </DialogFooter>
+                      </DialogContent>
+                    </Dialog>
                     
                     <Button 
                       onClick={() => handleCopyLink(doc.url, doc.id)}
