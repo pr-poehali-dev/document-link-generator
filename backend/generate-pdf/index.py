@@ -77,55 +77,15 @@ def draw_signature(c, sig_data: str, x: float, y: float, max_width: float = 40*m
 
 def draw_header_decoration(c, width, height):
     from reportlab.lib.colors import HexColor
-    blue_dark = HexColor('#1e40af')
-    blue_mid = HexColor('#2563eb')
     blue_light = HexColor('#3b82f6')
-    blue_lighter = HexColor('#60a5fa')
-    blue_bg = HexColor('#eff6ff')
-    white = HexColor('#ffffff')
+    blue_bg = HexColor('#f0f9ff')
     
     c.setFillColor(blue_bg)
-    c.rect(0, height - 70*mm, width, 70*mm, fill=1, stroke=0)
+    c.rect(0, height - 50*mm, width, 50*mm, fill=1, stroke=0)
     
-    num_circles = 15
-    for i in range(num_circles):
-        import random
-        random.seed(i + 100)
-        x = random.uniform(0, width)
-        y = height - random.uniform(10*mm, 60*mm)
-        size = random.uniform(2*mm, 8*mm)
-        opacity_colors = [blue_lighter, blue_light, blue_mid]
-        c.setFillColor(random.choice(opacity_colors))
-        c.circle(x, y, size, fill=1, stroke=0)
-    
-    c.setFillColor(blue_dark)
-    c.circle(width - 35*mm, height - 25*mm, 30*mm, fill=1, stroke=0)
-    
-    c.setFillColor(blue_mid)
-    c.circle(width - 40*mm, height - 30*mm, 25*mm, fill=1, stroke=0)
-    
-    c.setFillColor(blue_light)
-    c.circle(width - 45*mm, height - 35*mm, 20*mm, fill=1, stroke=0)
-    
-    c.setStrokeColor(white)
-    c.setLineWidth(3)
-    for i in range(3):
-        y_pos = height - 32*mm - i*3*mm
-        c.line(width - 50*mm, y_pos, width - 30*mm, y_pos)
-    
-    c.setFillColor(blue_dark)
-    c.rect(25*mm, height - 55*mm, 10*mm, 10*mm, fill=1, stroke=0)
-    
-    c.setFillColor(blue_light)
-    c.circle(30*mm, height - 50*mm, 4*mm, fill=1, stroke=0)
-    
-    c.setFillColor(white)
-    c.setFont('Helvetica-Bold', 16)
-    c.drawString(30*mm - 2*mm, height - 52*mm, '₽')
-    
-    c.setStrokeColor(blue_mid)
-    c.setLineWidth(2.5)
-    c.line(30*mm, height - 65*mm, width - 30*mm, height - 65*mm)
+    c.setStrokeColor(blue_light)
+    c.setLineWidth(2)
+    c.line(30*mm, height - 48*mm, width - 30*mm, height - 48*mm)
 
 def draw_document_icon(c, x, y):
     from reportlab.lib.colors import HexColor
@@ -236,20 +196,18 @@ def create_loan_agreement(logo: str = None, signature: str = None, client_data: 
     draw_header_decoration(c, width, height)
     
     if logo:
-        draw_logo(c, logo, width - 70*mm, height - 25*mm)
-    else:
-        draw_document_icon(c, 30*mm, height - 50*mm)
+        draw_logo(c, logo, width - 60*mm, height - 20*mm)
     
-    y = height - 30*mm
+    y = height - 20*mm
     c.setFillColor(blue_dark)
-    c.setFont(font_name, 24)
-    c.drawString(55*mm, y, "ДОГОВОР ЗАЙМА")
+    c.setFont(font_name, 22)
+    c.drawString(30*mm, y, "ДОГОВОР ЗАЙМА")
     
     from reportlab.lib.colors import HexColor
     c.setFillColor(HexColor('#6b7280'))
-    c.setFont(font_name, 10)
-    y -= 6*mm
-    c.drawString(55*mm, y, "Официальный документ | Защищено законодательством РФ")
+    c.setFont(font_name, 9)
+    y -= 5*mm
+    c.drawString(30*mm, y, "Официальный документ | Защищено законодательством РФ")
     
     from datetime import datetime
     current_date = datetime.now()
@@ -260,12 +218,12 @@ def create_loan_agreement(logo: str = None, signature: str = None, client_data: 
     month = month_names[current_date.month - 1]
     year = current_date.strftime('%Y')
     
-    y = height - 65*mm
+    y = height - 50*mm
     c.setFillColor(gray_text)
-    c.setFont(font_name, 11)
+    c.setFont(font_name, 10)
     c.drawString(30*mm, y, "г. Москва")
     c.drawRightString(width - 30*mm, y, f"«{day}» {month} {year} г.")
-    y -= 15*mm
+    y -= 12*mm
     
     c.setFont(font_name, 10)
     c.setFillColor(gray_text)
@@ -375,7 +333,6 @@ def create_loan_agreement(logo: str = None, signature: str = None, client_data: 
     for line_type, line in text_lines:
         if y < 30*mm:
             c.showPage()
-            draw_header_decoration(c, width, height)
             y = height - 30*mm
         
         if line_type == "header":
@@ -432,24 +389,22 @@ def create_consent_form(logo: str = None, signature: str = None, client_data: Di
     draw_header_decoration(c, width, height)
     
     if logo:
-        draw_logo(c, logo, width - 70*mm, height - 25*mm)
-    else:
-        draw_shield_icon(c, 30*mm, height - 50*mm)
+        draw_logo(c, logo, width - 60*mm, height - 20*mm)
     
-    y = height - 30*mm
+    y = height - 20*mm
     c.setFillColor(blue_dark)
-    c.setFont(font_name, 20)
-    c.drawString(55*mm, y, "СОГЛАСИЕ НА ОБРАБОТКУ")
-    y -= 7*mm
-    c.drawString(55*mm, y, "ПЕРСОНАЛЬНЫХ ДАННЫХ")
+    c.setFont(font_name, 18)
+    c.drawString(30*mm, y, "СОГЛАСИЕ НА ОБРАБОТКУ")
+    y -= 6*mm
+    c.drawString(30*mm, y, "ПЕРСОНАЛЬНЫХ ДАННЫХ")
     
     from reportlab.lib.colors import HexColor
     c.setFillColor(HexColor('#6b7280'))
-    c.setFont(font_name, 9)
-    y -= 5*mm
-    c.drawString(55*mm, y, "В соответствии с ФЗ-152 «О персональных данных»")
+    c.setFont(font_name, 8)
+    y -= 4*mm
+    c.drawString(30*mm, y, "В соответствии с ФЗ-152 «О персональных данных»")
     
-    y = height - 65*mm
+    y = height - 50*mm
     c.setFont(font_name, 10)
     c.setFillColor(gray_text)
     
@@ -552,22 +507,20 @@ def create_refund_policy(logo: str = None, signature: str = None, client_data: D
     draw_header_decoration(c, width, height)
     
     if logo:
-        draw_logo(c, logo, width - 70*mm, height - 25*mm)
-    else:
-        draw_money_icon(c, 30*mm, height - 50*mm)
+        draw_logo(c, logo, width - 60*mm, height - 20*mm)
     
-    y = height - 30*mm
+    y = height - 20*mm
     c.setFillColor(blue_dark)
-    c.setFont(font_name, 24)
-    c.drawString(55*mm, y, "ВОЗВРАТ ПЛАТЕЖЕЙ")
+    c.setFont(font_name, 22)
+    c.drawString(30*mm, y, "ВОЗВРАТ ПЛАТЕЖЕЙ")
     
     from reportlab.lib.colors import HexColor
     c.setFillColor(HexColor('#6b7280'))
-    c.setFont(font_name, 10)
-    y -= 6*mm
-    c.drawString(55*mm, y, "Политика возврата денежных средств")
+    c.setFont(font_name, 9)
+    y -= 5*mm
+    c.drawString(30*mm, y, "Политика возврата денежных средств")
     
-    y = height - 65*mm
+    y = height - 50*mm
     c.setFont(font_name, 10)
     c.setFillColor(gray_text)
     
