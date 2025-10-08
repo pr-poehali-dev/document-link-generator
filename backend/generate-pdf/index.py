@@ -132,15 +132,15 @@ def draw_text_signature(c, x: float, y: float, font_name: str = 'Helvetica'):
 
 def draw_header_decoration(c, width, height):
     from reportlab.lib.colors import HexColor
-    blue_light = HexColor('#3b82f6')
-    blue_bg = HexColor('#f0f9ff')
+    navy = HexColor('#1e3a8a')
+    light_gray = HexColor('#f8fafc')
     
-    c.setFillColor(blue_bg)
-    c.rect(0, height - 50*mm, width, 50*mm, fill=1, stroke=0)
+    c.setFillColor(light_gray)
+    c.rect(0, height - 45*mm, width, 45*mm, fill=1, stroke=0)
     
-    c.setStrokeColor(blue_light)
-    c.setLineWidth(2)
-    c.line(30*mm, height - 48*mm, width - 30*mm, height - 48*mm)
+    c.setStrokeColor(navy)
+    c.setLineWidth(0.5)
+    c.line(30*mm, height - 43*mm, width - 30*mm, height - 43*mm)
 
 def draw_document_icon(c, x, y):
     from reportlab.lib.colors import HexColor
@@ -253,16 +253,16 @@ def create_loan_agreement(logo: str = None, signature: str = None, client_data: 
     if logo:
         draw_logo(c, logo, width - 60*mm, height - 20*mm)
     
-    y = height - 20*mm
+    y = height - 22*mm
     c.setFillColor(blue_dark)
-    c.setFont(font_name, 22)
+    c.setFont('Helvetica-Bold', 20)
     c.drawString(30*mm, y, "ДОГОВОР ЗАЙМА")
     
     from reportlab.lib.colors import HexColor
-    c.setFillColor(HexColor('#6b7280'))
-    c.setFont(font_name, 9)
-    y -= 5*mm
-    c.drawString(30*mm, y, "Официальный документ | Защищено законодательством РФ")
+    c.setFillColor(HexColor('#64748b'))
+    c.setFont(font_name, 8)
+    y -= 4.5*mm
+    c.drawString(30*mm, y, "Официальный документ")
     
     from datetime import datetime
     current_date = datetime.now()
@@ -274,11 +274,11 @@ def create_loan_agreement(logo: str = None, signature: str = None, client_data: 
     year = current_date.strftime('%Y')
     
     y = height - 50*mm
-    c.setFillColor(gray_text)
-    c.setFont(font_name, 10)
+    c.setFillColor(HexColor('#475569'))
+    c.setFont(font_name, 9)
     c.drawString(30*mm, y, "г. Москва")
     c.drawRightString(width - 30*mm, y, f"«{day}» {month} {year} г.")
-    y -= 12*mm
+    y -= 10*mm
     
     c.setFont(font_name, 10)
     c.setFillColor(gray_text)
@@ -391,34 +391,36 @@ def create_loan_agreement(logo: str = None, signature: str = None, client_data: 
             y = height - 30*mm
         
         if line_type == "header":
-            c.setFont(font_name, 11)
-            c.setFillColor(blue_text)
+            c.setFont('Helvetica-Bold', 10)
+            c.setFillColor(HexColor('#1e293b'))
             c.drawString(30*mm, y, line)
-            c.setFont(font_name, 10)
+            c.setFont(font_name, 9)
             c.setFillColor(gray_text)
-            y -= 6*mm
+            y -= 5.5*mm
         elif line_type == "highlight":
-            c.setFillColor(HexColor('#10b981'))
-            c.roundRect(28*mm, y - 3*mm, width - 56*mm, 8*mm, 2*mm, fill=1, stroke=0)
-            c.setFillColor(HexColor('#ffffff'))
-            c.setFont(font_name, 12)
+            c.setFillColor(HexColor('#f1f5f9'))
+            c.setStrokeColor(HexColor('#cbd5e1'))
+            c.setLineWidth(0.5)
+            c.roundRect(28*mm, y - 2.5*mm, width - 56*mm, 7*mm, 1*mm, fill=1, stroke=1)
+            c.setFillColor(HexColor('#0f172a'))
+            c.setFont('Helvetica-Bold', 11)
             c.drawString(32*mm, y, line)
-            c.setFont(font_name, 10)
+            c.setFont(font_name, 9)
             c.setFillColor(gray_text)
-            y -= 10*mm
+            y -= 9*mm
         elif line_type == "contact":
-            c.setFillColor(blue_dark)
+            c.setFillColor(HexColor('#334155'))
             c.drawString(30*mm, y, line)
             c.setFillColor(gray_text)
-            y -= 5*mm
+            y -= 4.5*mm
         elif line_type == "space":
-            y -= 3*mm
+            y -= 2.5*mm
         else:
             c.drawString(30*mm, y, line)
-            y -= 5*mm
+            y -= 4.5*mm
     
-    c.setStrokeColor(HexColor('#3b82f6'))
-    c.setLineWidth(1)
+    c.setStrokeColor(HexColor('#cbd5e1'))
+    c.setLineWidth(0.5)
     c.line(30*mm, 25*mm, width - 30*mm, 25*mm)
     
     if signature:
@@ -448,22 +450,22 @@ def create_consent_form(logo: str = None, signature: str = None, client_data: Di
     if logo:
         draw_logo(c, logo, width - 60*mm, height - 20*mm)
     
-    y = height - 20*mm
+    y = height - 22*mm
     c.setFillColor(blue_dark)
-    c.setFont(font_name, 18)
+    c.setFont('Helvetica-Bold', 18)
     c.drawString(30*mm, y, "СОГЛАСИЕ НА ОБРАБОТКУ")
-    y -= 6*mm
+    y -= 5.5*mm
     c.drawString(30*mm, y, "ПЕРСОНАЛЬНЫХ ДАННЫХ")
     
     from reportlab.lib.colors import HexColor
-    c.setFillColor(HexColor('#6b7280'))
-    c.setFont(font_name, 8)
-    y -= 4*mm
+    c.setFillColor(HexColor('#64748b'))
+    c.setFont(font_name, 7)
+    y -= 3.5*mm
     c.drawString(30*mm, y, "В соответствии с ФЗ-152 «О персональных данных»")
     
     y = height - 50*mm
-    c.setFont(font_name, 10)
-    c.setFillColor(gray_text)
+    c.setFont(font_name, 9)
+    c.setFillColor(HexColor('#475569'))
     
     if not client_data:
         client_data = {}
@@ -520,25 +522,25 @@ def create_consent_form(logo: str = None, signature: str = None, client_data: Di
             y = height - 30*mm
         
         if line_type == "header":
-            c.setFont(font_name, 11)
-            c.setFillColor(blue_text)
+            c.setFont('Helvetica-Bold', 10)
+            c.setFillColor(HexColor('#1e293b'))
             c.drawString(30*mm, y, line)
-            c.setFont(font_name, 10)
+            c.setFont(font_name, 9)
             c.setFillColor(gray_text)
-            y -= 6*mm
+            y -= 5.5*mm
         elif line_type == "contact":
-            c.setFillColor(blue_dark)
+            c.setFillColor(HexColor('#334155'))
             c.drawString(30*mm, y, line)
             c.setFillColor(gray_text)
-            y -= 5*mm
+            y -= 4.5*mm
         elif line_type == "space":
-            y -= 3*mm
+            y -= 2.5*mm
         else:
             c.drawString(30*mm, y, line)
-            y -= 5*mm
+            y -= 4.5*mm
     
-    c.setStrokeColor(HexColor('#3b82f6'))
-    c.setLineWidth(1)
+    c.setStrokeColor(HexColor('#cbd5e1'))
+    c.setLineWidth(0.5)
     c.line(30*mm, 25*mm, width - 30*mm, 25*mm)
     
     if signature:
@@ -568,20 +570,20 @@ def create_refund_policy(logo: str = None, signature: str = None, client_data: D
     if logo:
         draw_logo(c, logo, width - 60*mm, height - 20*mm)
     
-    y = height - 20*mm
+    y = height - 22*mm
     c.setFillColor(blue_dark)
-    c.setFont(font_name, 22)
+    c.setFont('Helvetica-Bold', 20)
     c.drawString(30*mm, y, "ВОЗВРАТ ПЛАТЕЖЕЙ")
     
     from reportlab.lib.colors import HexColor
-    c.setFillColor(HexColor('#6b7280'))
-    c.setFont(font_name, 9)
-    y -= 5*mm
+    c.setFillColor(HexColor('#64748b'))
+    c.setFont(font_name, 8)
+    y -= 4.5*mm
     c.drawString(30*mm, y, "Политика возврата денежных средств")
     
     y = height - 50*mm
-    c.setFont(font_name, 10)
-    c.setFillColor(gray_text)
+    c.setFont(font_name, 9)
+    c.setFillColor(HexColor('#475569'))
     
     if not client_data:
         client_data = {}
@@ -659,25 +661,25 @@ def create_refund_policy(logo: str = None, signature: str = None, client_data: D
             y = height - 30*mm
         
         if line_type == "header":
-            c.setFont(font_name, 11)
-            c.setFillColor(blue_text)
+            c.setFont('Helvetica-Bold', 10)
+            c.setFillColor(HexColor('#1e293b'))
             c.drawString(30*mm, y, line)
-            c.setFont(font_name, 10)
+            c.setFont(font_name, 9)
             c.setFillColor(gray_text)
-            y -= 6*mm
+            y -= 5.5*mm
         elif line_type == "contact":
-            c.setFillColor(blue_dark)
+            c.setFillColor(HexColor('#334155'))
             c.drawString(30*mm, y, line)
             c.setFillColor(gray_text)
-            y -= 5*mm
+            y -= 4.5*mm
         elif line_type == "space":
-            y -= 3*mm
+            y -= 2.5*mm
         else:
             c.drawString(30*mm, y, line)
-            y -= 5*mm
+            y -= 4.5*mm
     
-    c.setStrokeColor(HexColor('#3b82f6'))
-    c.setLineWidth(1)
+    c.setStrokeColor(HexColor('#cbd5e1'))
+    c.setLineWidth(0.5)
     c.line(30*mm, 25*mm, width - 30*mm, 25*mm)
     
     if signature:
