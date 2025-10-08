@@ -1,0 +1,22 @@
+{
+  "tests": [
+    {
+      "name": "Generate loan agreement PDF",
+      "method": "GET",
+      "path": "/?type=loan",
+      "expectedStatus": 200,
+      "headers": {
+        "Content-Type": "application/pdf"
+      }
+    },
+    {
+      "name": "Generate consent form PDF",
+      "method": "GET",
+      "path": "/?type=consent",
+      "expectedStatus": 200,
+      "headers": {
+        "Content-Type": "application/pdf"
+      }
+    }
+  ]
+}

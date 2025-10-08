@@ -4,27 +4,32 @@ import Icon from "@/components/ui/icon";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 
+const BASE_URL = "https://functions.poehali.dev/502d518c-5d60-4ce9-a293-c916a64f50db";
+
 const documents = [
   {
     id: 1,
     title: "Договор займа",
     description: "Типовой договор займа с полным перечнем условий и обязательств сторон",
-    url: "https://example.com/documents/loan-agreement.pdf",
-    icon: "FileText"
+    url: `${BASE_URL}?type=loan`,
+    icon: "FileText",
+    type: "loan"
   },
   {
     id: 2,
     title: "Согласие на обработку персональных данных",
     description: "Документ о согласии на сбор и обработку персональных данных в соответствии с законодательством",
-    url: "https://example.com/documents/personal-data-consent.pdf",
-    icon: "Shield"
+    url: `${BASE_URL}?type=consent`,
+    icon: "Shield",
+    type: "consent"
   },
   {
     id: 3,
     title: "Возврат платежей",
     description: "Порядок и условия возврата денежных средств согласно действующему законодательству",
-    url: "https://example.com/documents/refund-policy.pdf",
-    icon: "ArrowLeftRight"
+    url: `${BASE_URL}?type=refund`,
+    icon: "ArrowLeftRight",
+    type: "refund"
   }
 ];
 
@@ -43,7 +48,13 @@ const Index = () => {
   };
 
   const handleDownload = (url: string) => {
-    window.open(url, '_blank');
+    const link = document.createElement('a');
+    link.href = url;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   return (
